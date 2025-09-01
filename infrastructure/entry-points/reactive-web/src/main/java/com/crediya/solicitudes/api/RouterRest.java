@@ -3,6 +3,7 @@ package com.crediya.solicitudes.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,10 @@ public class RouterRest {
                     summary = "Create a loan application",
                     description = "Validates customer and loan info, sets initial status to PENDING_REVIEW and persists the application",
                     tags = {"Loan Applications"},
+                    requestBody = @RequestBody(
+                            required = true,
+                            content = @Content(schema = @Schema(implementation = com.crediya.solicitudes.api.dto.CreateLoanRequestRequest.class))
+                    ),
                     responses = {
                             @ApiResponse(responseCode = "201", description = "Application created",
                                     content = @Content(schema = @Schema(implementation = com.crediya.solicitudes.api.dto.LoanApplicationResponse.class))),

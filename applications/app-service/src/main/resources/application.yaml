@@ -6,21 +6,37 @@ spring:
     name: "ms-solicitudes"
   devtools:
     add-properties: false
-  h2:
-    console:
-      enabled: true
-      path: "/h2"
-  jackson:
-    property-naming-strategy: SNAKE_CASE
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/crediya
+    username: yulianaarangolopez
+    password: ""
+    initialization-mode: never
   sql:
     init:
       mode: never
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  profiles:
+    include: null
+  jackson:
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,prometheus"
+  endpoint:
+    health:
+      probes:
+        enabled: true
 
 cors:
-  allowed-origins: "*"
+  allowed-origins: "http://localhost:4200,http://localhost:8080"
 
 app:
-  mock-mode: true
+  mock-mode: false
 
 adapters:
   r2dbc:
@@ -29,6 +45,7 @@ adapters:
     database: crediya
     schema: public
     username: yulianaarangolopez
+    password: ""
     initial-size: 2
     max-size: 10
     max-idle-time: 30s

@@ -15,7 +15,9 @@ import java.time.Duration;
 @EnableConfigurationProperties(PostgresqlConnectionProperties.class)
 @Configuration
 @ConditionalOnProperty(name = "app.mock-mode", havingValue = "false")
-public class PostgreSQLConnectionPool {public static final int INITIAL_SIZE = 12;
+public class PostgreSQLConnectionPool {
+
+    public static final int INITIAL_SIZE = 12;
     public static final int MAX_SIZE = 15;
     public static final int MAX_IDLE_TIME_MINUTES = 30;
 
