@@ -55,16 +55,20 @@ subprojects {
 
     pitest {
         targetClasses = ['com.crediya.solicitudes.*']
-        excludedClasses = []
+        excludedClasses = [
+            'com.crediya.solicitudes.model.common.*',
+            'com.crediya.solicitudes.model.**.gateways.*',
+            '**.*Application',
+            '**.*Config*'
+        ]
         excludedTestClasses = []
         pitestVersion = '1.20.1'
         verbose = false
         outputFormats = ['XML', 'HTML']
-        threads = 8
+        threads = 4
         exportLineCoverage = true
         useClasspathFile = true
         timestampedReports = false
-        //mutators = ['STRONGER', 'DEFAULTS']
         fileExtensionsToFilter.addAll('xml', 'orbit')
         junit5PluginVersion = '1.2.2'
         failWhenNoMutations = false
