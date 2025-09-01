@@ -1,0 +1,20 @@
+spring:
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb
+  sql:
+    init:
+      mode: never
+  main:
+    allow-bean-definition-overriding: true
+
+adapters:
+  r2dbc:
+    host: localhost
+    database: testdb
+    username: sa
+    password: 
+    port: 0
+
+logging:
+  level:
+    com.crediya: DEBUG

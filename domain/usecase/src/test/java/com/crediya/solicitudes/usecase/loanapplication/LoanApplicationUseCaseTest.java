@@ -38,7 +38,6 @@ class LoanApplicationUseCaseTest {
     @BeforeEach
     void setUp() {
         useCase = new LoanApplicationUseCase(loanApplicationRepository, loanTypeRepository, tx);
-        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Test
@@ -56,6 +55,7 @@ class LoanApplicationUseCaseTest {
                 .status(LoanStatus.PENDING_REVIEW)
                 .build();
 
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(loanTypeRepository.existsActiveByCode("PERSONAL")).thenReturn(Mono.just(true));
         when(loanApplicationRepository.save(any(LoanApplication.class))).thenReturn(Mono.just(saved));
 
@@ -221,6 +221,7 @@ class LoanApplicationUseCaseTest {
                 .loanType("INVALID_TYPE")
                 .build();
 
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(loanTypeRepository.existsActiveByCode("INVALID_TYPE")).thenReturn(Mono.just(false));
 
         StepVerifier.create(useCase.execute(input))
@@ -237,6 +238,7 @@ class LoanApplicationUseCaseTest {
                 .loanType("INACTIVE_TYPE")
                 .build();
 
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(loanTypeRepository.existsActiveByCode("INACTIVE_TYPE")).thenReturn(Mono.just(false));
 
         StepVerifier.create(useCase.execute(input))
