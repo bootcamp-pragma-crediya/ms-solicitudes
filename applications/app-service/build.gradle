@@ -19,4 +19,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
     implementation 'org.reactivecommons.utils:object-mapper:0.1.0'
     runtimeOnly 'io.r2dbc:r2dbc-h2'
+    testRuntimeOnly 'io.r2dbc:r2dbc-h2'
+    testRuntimeOnly 'com.h2database:h2'
 }

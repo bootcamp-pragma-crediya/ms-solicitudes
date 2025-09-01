@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.crediya.solicitudes.model.loanapplication.gateways.LoanApplicationRepository;
 import com.crediya.solicitudes.model.loantype.gateways.LoanTypeRepository;
 import com.crediya.solicitudes.model.loantype.LoanType;
@@ -19,16 +19,21 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.math.BigDecimal;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(locations = "classpath:application-test.yml")
+@TestPropertySource(properties = {
+    "spring.r2dbc.url=r2dbc:h2:mem:///testdb",
+    "spring.sql.init.mode=never",
+    "spring.main.allow-bean-definition-overriding=true",
+    "logging.level.com.crediya=DEBUG"
+})
 class LoanApplicationIntegrationTest {
 
     @Autowired
     private WebTestClient webTestClient;
     
-    @MockBean
+    @MockitoBean
     private LoanApplicationRepository loanApplicationRepository;
     
-    @MockBean
+    @MockitoBean
     private LoanTypeRepository loanTypeRepository;
 
     @Test
