@@ -1,0 +1,39 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: "ms-solicitudes"
+  devtools:
+    add-properties: false
+  h2:
+    console:
+      enabled: true
+      path: "/h2"
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  sql:
+    init:
+      mode: never
+
+cors:
+  allowed-origins: "*"
+
+app:
+  mock-mode: true
+
+adapters:
+  r2dbc:
+    host: localhost
+    port: 5432
+    database: crediya
+    schema: public
+    username: yulianaarangolopez
+    initial-size: 2
+    max-size: 10
+    max-idle-time: 30s
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tryItOutEnabled: true
