@@ -55,9 +55,9 @@ class LoanApplicationUseCaseTest {
                 .status(LoanStatus.PENDING_REVIEW)
                 .build();
 
-        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(loanTypeRepository.existsActiveByCode("PERSONAL")).thenReturn(Mono.just(true));
         when(loanApplicationRepository.save(any(LoanApplication.class))).thenReturn(Mono.just(saved));
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // When & Then
         StepVerifier.create(useCase.execute(input))

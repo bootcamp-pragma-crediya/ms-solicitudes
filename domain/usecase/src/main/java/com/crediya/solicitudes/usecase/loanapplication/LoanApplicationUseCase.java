@@ -20,29 +20,46 @@ public class LoanApplicationUseCase {
     private final ReactiveTransaction tx;
 
     public Mono<LoanApplication> execute(LoanApplication application) {
-
-        if (application == null) {
-            return Mono.error(new InvalidLoanApplicationException("Body is required"));
-        }
-        if (application.getCustomerDocument() == null || application.getCustomerDocument().isBlank()) {
-            return Mono.error(new InvalidLoanApplicationException("customerDocument is required"));
-        }
-        if (application.getAmount() == null || application.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            return Mono.error(new InvalidLoanApplicationException("amount must be > 0"));
-        }
-        if (application.getTermMonths() == null || application.getTermMonths() <= 0) {
-            return Mono.error(new InvalidLoanApplicationException("termMonths must be > 0"));
-        }
-        if (application.getLoanType() == null || application.getLoanType().isBlank()) {
-            return Mono.error(new InvalidLoanApplicationException("loanType is required"));
-        }
-
-        return loanTypeRepository.existsActiveByCode(application.getLoanType())
-                .flatMap(exists -> exists
-                        ? persistWithInitialStatus(application)
-                        : Mono.error(new InvalidLoanTypeException("loanType is invalid or inactive"))
-                )
+        return Mono.justOrEmpty(application)
+                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException("Body is required")))
+                .flatMap(this::validateCustomerDocument)
+                .flatMap(this::validateAmount)
+                .flatMap(this::validateTermMonths)
+                .flatMap(this::validateLoanType)
+                .flatMap(this::validateLoanTypeExists)
+                .flatMap(this::persistWithInitialStatus)
                 .transform(tx::transactional);
+    }
+
+    private Mono<LoanApplication> validateCustomerDocument(LoanApplication application) {
+        return Mono.just(application)
+                .filter(app -> app.getCustomerDocument() != null && !app.getCustomerDocument().isBlank())
+                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException("customerDocument is required")));
+    }
+
+    private Mono<LoanApplication> validateAmount(LoanApplication application) {
+        return Mono.just(application)
+                .filter(app -> app.getAmount() != null && app.getAmount().compareTo(BigDecimal.ZERO) > 0)
+                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException("amount must be > 0")));
+    }
+
+    private Mono<LoanApplication> validateTermMonths(LoanApplication application) {
+        return Mono.just(application)
+                .filter(app -> app.getTermMonths() != null && app.getTermMonths() > 0)
+                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException("termMonths must be > 0")));
+    }
+
+    private Mono<LoanApplication> validateLoanType(LoanApplication application) {
+        return Mono.just(application)
+                .filter(app -> app.getLoanType() != null && !app.getLoanType().isBlank())
+                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException("loanType is required")));
+    }
+
+    private Mono<LoanApplication> validateLoanTypeExists(LoanApplication application) {
+        return loanTypeRepository.existsActiveByCode(application.getLoanType())
+                .filter(exists -> exists)
+                .switchIfEmpty(Mono.error(new InvalidLoanTypeException("loanType is invalid or inactive")))
+                .thenReturn(application);
     }
 
     private Mono<LoanApplication> persistWithInitialStatus(LoanApplication in) {
