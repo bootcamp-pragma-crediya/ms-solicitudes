@@ -36,9 +36,17 @@ public class LoanApplicationHandler {
     }
 
     private Mono<ServerResponse> handleError(Throwable error) {
-        log.error("[Handler] Error processing request", error);
-        return ServerResponse.badRequest()
+        log.error("[Handler] Error processing request: {}", error.getMessage(), error);
+        
+        if (error instanceof com.crediya.solicitudes.model.exception.InvalidLoanApplicationException ||
+            error instanceof com.crediya.solicitudes.model.exception.InvalidLoanTypeException) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(java.util.Map.of("error", "Bad Request", "message", error.getMessage()));
+        }
+        
+        return ServerResponse.status(500)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(java.util.Map.of("message", error.getMessage()));
+                .bodyValue(java.util.Map.of("error", "Internal Server Error", "message", "An unexpected error occurred"));
     }
 }

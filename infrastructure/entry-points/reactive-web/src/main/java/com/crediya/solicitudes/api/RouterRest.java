@@ -38,11 +38,12 @@ public class RouterRest {
                             content = @Content(schema = @Schema(implementation = com.crediya.solicitudes.api.dto.CreateLoanRequestRequest.class))
                     ),
                     responses = {
-                            @ApiResponse(responseCode = "201", description = "Application created",
+                            @ApiResponse(responseCode = "201", description = "Application created successfully",
                                     content = @Content(schema = @Schema(implementation = com.crediya.solicitudes.api.dto.LoanApplicationResponse.class))),
-                            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
-                            @ApiResponse(responseCode = "500", description = "Unexpected error", content = @Content)
-                    }
+                            @ApiResponse(responseCode = "400", description = "Bad Request - Invalid input data",
+                                    content = @Content(schema = @Schema(example = "{\"error\": \"Bad Request\", \"message\": \"customerDocument is required\"}"))),
+                            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                                    content = @Content(schema = @Schema(example = "{\"error\": \"Internal Server Error\", \"message\": \"An unexpected error occurred\"}")))                    }
             )
     )
     public RouterFunction<ServerResponse> loanApplicationRoutes(LoanApplicationHandler handler) {
