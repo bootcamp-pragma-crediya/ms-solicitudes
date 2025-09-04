@@ -31,6 +31,6 @@ class RouterRestTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{}")
                 .exchange()
-                .expectStatus().is4xxClientError();
+                .expectStatus().isBadRequest();
     }
 }

@@ -12,4 +12,12 @@ public interface LoanDtoMapper {
     LoanApplication toDomain(CreateLoanRequestRequest request);
     
     LoanApplicationResponse toResponse(LoanApplication app);
+    
+    default LoanApplication safeToDomain(CreateLoanRequestRequest request) {
+        if (request == null) {
+            return LoanApplication.builder().build();
+        }
+        LoanApplication result = toDomain(request);
+        return result != null ? result : LoanApplication.builder().build();
+    }
 }

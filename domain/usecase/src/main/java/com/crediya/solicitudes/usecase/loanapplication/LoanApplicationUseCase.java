@@ -3,6 +3,7 @@ package com.crediya.solicitudes.usecase.loanapplication;
 import com.crediya.solicitudes.model.common.ReactiveTransaction;
 import com.crediya.solicitudes.model.exception.InvalidLoanApplicationException;
 import com.crediya.solicitudes.model.exception.InvalidLoanTypeException;
+import com.crediya.solicitudes.model.exception.ValidationMessage;
 import com.crediya.solicitudes.model.loanapplication.LoanApplication;
 import com.crediya.solicitudes.model.loanapplication.gateways.LoanApplicationRepository;
 import com.crediya.solicitudes.model.loanstatus.LoanStatus;
@@ -21,7 +22,7 @@ public class LoanApplicationUseCase {
 
     public Mono<LoanApplication> execute(LoanApplication application) {
         return Mono.justOrEmpty(application)
-                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException("Body is required")))
+                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException(ValidationMessage.BODY_REQUIRED.getMessage())))
                 .flatMap(this::validateCustomerDocument)
                 .flatMap(this::validateAmount)
                 .flatMap(this::validateTermMonths)
@@ -34,31 +35,31 @@ public class LoanApplicationUseCase {
     private Mono<LoanApplication> validateCustomerDocument(LoanApplication application) {
         return Mono.just(application)
                 .filter(app -> app.getCustomerDocument() != null && !app.getCustomerDocument().isBlank())
-                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException("customerDocument is required")));
+                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException(ValidationMessage.CUSTOMER_DOCUMENT_REQUIRED.getMessage())));
     }
 
     private Mono<LoanApplication> validateAmount(LoanApplication application) {
         return Mono.just(application)
                 .filter(app -> app.getAmount() != null && app.getAmount().compareTo(BigDecimal.ZERO) > 0)
-                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException("amount must be > 0")));
+                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException(ValidationMessage.AMOUNT_MUST_BE_POSITIVE.getMessage())));
     }
 
     private Mono<LoanApplication> validateTermMonths(LoanApplication application) {
         return Mono.just(application)
                 .filter(app -> app.getTermMonths() != null && app.getTermMonths() > 0)
-                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException("termMonths must be > 0")));
+                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException(ValidationMessage.TERM_MONTHS_MUST_BE_POSITIVE.getMessage())));
     }
 
     private Mono<LoanApplication> validateLoanType(LoanApplication application) {
         return Mono.just(application)
                 .filter(app -> app.getLoanType() != null && !app.getLoanType().isBlank())
-                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException("loanType is required")));
+                .switchIfEmpty(Mono.error(new InvalidLoanApplicationException(ValidationMessage.LOAN_TYPE_REQUIRED.getMessage())));
     }
 
     private Mono<LoanApplication> validateLoanTypeExists(LoanApplication application) {
         return loanTypeRepository.existsActiveByCode(application.getLoanType())
                 .filter(exists -> exists)
-                .switchIfEmpty(Mono.error(new InvalidLoanTypeException("loanType is invalid or inactive")))
+                .switchIfEmpty(Mono.error(new InvalidLoanTypeException(ValidationMessage.LOAN_TYPE_INVALID.getMessage())))
                 .thenReturn(application);
     }
 

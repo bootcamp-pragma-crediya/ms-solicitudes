@@ -67,6 +67,8 @@ class LoanApplicationUseCaseTest {
 
     @Test
     void shouldFailWhenApplicationIsNull() {
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        
         StepVerifier.create(useCase.execute(null))
                 .expectError(InvalidLoanApplicationException.class)
                 .verify();
@@ -80,6 +82,8 @@ class LoanApplicationUseCaseTest {
                 .termMonths(12)
                 .loanType("PERSONAL")
                 .build();
+
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         StepVerifier.create(useCase.execute(input))
                 .expectError(InvalidLoanApplicationException.class)
@@ -95,6 +99,8 @@ class LoanApplicationUseCaseTest {
                 .loanType("PERSONAL")
                 .build();
 
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
         StepVerifier.create(useCase.execute(input))
                 .expectError(InvalidLoanApplicationException.class)
                 .verify();
@@ -108,6 +114,8 @@ class LoanApplicationUseCaseTest {
                 .termMonths(12)
                 .loanType("PERSONAL")
                 .build();
+
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         StepVerifier.create(useCase.execute(input))
                 .expectError(InvalidLoanApplicationException.class)
@@ -123,6 +131,8 @@ class LoanApplicationUseCaseTest {
                 .loanType("PERSONAL")
                 .build();
 
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
         StepVerifier.create(useCase.execute(input))
                 .expectError(InvalidLoanApplicationException.class)
                 .verify();
@@ -136,6 +146,8 @@ class LoanApplicationUseCaseTest {
                 .termMonths(12)
                 .loanType("PERSONAL")
                 .build();
+
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         StepVerifier.create(useCase.execute(input))
                 .expectError(InvalidLoanApplicationException.class)
@@ -151,6 +163,8 @@ class LoanApplicationUseCaseTest {
                 .loanType("PERSONAL")
                 .build();
 
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
         StepVerifier.create(useCase.execute(input))
                 .expectError(InvalidLoanApplicationException.class)
                 .verify();
@@ -164,6 +178,8 @@ class LoanApplicationUseCaseTest {
                 .termMonths(0)
                 .loanType("PERSONAL")
                 .build();
+
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         StepVerifier.create(useCase.execute(input))
                 .expectError(InvalidLoanApplicationException.class)
@@ -179,6 +195,8 @@ class LoanApplicationUseCaseTest {
                 .loanType("PERSONAL")
                 .build();
 
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
         StepVerifier.create(useCase.execute(input))
                 .expectError(InvalidLoanApplicationException.class)
                 .verify();
@@ -193,6 +211,8 @@ class LoanApplicationUseCaseTest {
                 .loanType(null)
                 .build();
 
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
         StepVerifier.create(useCase.execute(input))
                 .expectError(InvalidLoanApplicationException.class)
                 .verify();
@@ -206,6 +226,8 @@ class LoanApplicationUseCaseTest {
                 .termMonths(12)
                 .loanType("   ")
                 .build();
+
+        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         StepVerifier.create(useCase.execute(input))
                 .expectError(InvalidLoanApplicationException.class)

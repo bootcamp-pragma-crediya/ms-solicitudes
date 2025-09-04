@@ -1,5 +1,7 @@
 package com.crediya.solicitudes.api;
 
+import com.crediya.solicitudes.api.constants.ErrorMessages;
+import com.crediya.solicitudes.api.constants.LogMessages;
 import com.crediya.solicitudes.model.exception.InvalidLoanApplicationException;
 import com.crediya.solicitudes.model.exception.InvalidLoanTypeException;
 import lombok.extern.slf4j.Slf4j;
@@ -20,28 +22,28 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WebExchangeBindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Mono<Map<String, Object>> handleBeanValidation(WebExchangeBindException ex) {
-        log.warn("[Error] Bean validation: {}", ex.getMessage());
-        return Mono.just(Map.of("message", "Validation failed"));
+        log.warn(LogMessages.ERROR_BEAN_VALIDATION, ex.getMessage());
+        return Mono.just(Map.of("message", ErrorMessages.VALIDATION_FAILED));
     }
 
     @ExceptionHandler(ServerWebInputException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Mono<Map<String, Object>> handleBadJson(ServerWebInputException ex) {
-        log.warn("[Error] Bad input: {}", ex.getReason());
-        return Mono.just(Map.of("message", "Invalid input"));
+        log.warn(LogMessages.ERROR_BAD_INPUT, ex.getReason());
+        return Mono.just(Map.of("message", ErrorMessages.INVALID_INPUT));
     }
 
     @ExceptionHandler({InvalidLoanApplicationException.class, InvalidLoanTypeException.class, IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Mono<Map<String, Object>> handleDomain(RuntimeException ex) {
-        log.warn("[Error] {}", ex.getMessage());
+        log.warn(LogMessages.ERROR_DOMAIN, ex.getMessage());
         return Mono.just(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Mono<Map<String, Object>> handleAny(Throwable ex) {
-        log.error("[Error] Unexpected", ex);
-        return Mono.just(Map.of("message", "An unexpected error occurred"));
+        log.error(LogMessages.ERROR_UNEXPECTED, ex);
+        return Mono.just(Map.of("message", ErrorMessages.UNEXPECTED_ERROR));
     }
 }

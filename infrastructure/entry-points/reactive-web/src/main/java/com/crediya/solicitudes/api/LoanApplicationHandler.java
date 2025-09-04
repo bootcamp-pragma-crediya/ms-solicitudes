@@ -1,5 +1,7 @@
 package com.crediya.solicitudes.api;
 
+import com.crediya.solicitudes.api.constants.ErrorMessages;
+import com.crediya.solicitudes.api.constants.LogMessages;
 import com.crediya.solicitudes.api.dto.CreateLoanRequestRequest;
 import com.crediya.solicitudes.api.dto.LoanApplicationResponse;
 import com.crediya.solicitudes.api.dto.LoanDtoMapper;
@@ -24,11 +26,17 @@ public class LoanApplicationHandler {
 
     public Mono<ServerResponse> create(ServerRequest request) {
         return request.bodyToMono(CreateLoanRequestRequest.class)
-                .doOnNext(req -> log.info("[Handler] POST /api/v1/solicitud doc={} type={} amount={} term={}",
+                .doOnNext(req -> log.info(LogMessages.HANDLER_POST_REQUEST,
                         req.customerDocument(), req.loanType(), req.amount(), req.termMonths()))
-                .flatMap(req -> useCase.execute(mapper.toDomain(req)))
+                .flatMap(req -> {
+                    var domain = mapper.toDomain(req);
+                    return domain != null ? Mono.just(domain) : 
+                           Mono.error(new com.crediya.solicitudes.model.exception.InvalidLoanApplicationException(
+                               com.crediya.solicitudes.model.exception.ValidationMessage.BODY_REQUIRED.getMessage()));
+                })
+                .flatMap(useCase::execute)
                 .map(mapper::toResponse)
-                .doOnSuccess(resp -> log.info("[Handler] Created id={} status={}", resp.id(), resp.status()))
+                .doOnSuccess(resp -> log.info(LogMessages.HANDLER_CREATED, resp.id(), resp.status()))
                 .flatMap(resp -> ServerResponse.created(URI.create("/api/v1/solicitud/" + resp.id()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(resp))
@@ -36,17 +44,17 @@ public class LoanApplicationHandler {
     }
 
     private Mono<ServerResponse> handleError(Throwable error) {
-        log.error("[Handler] Error processing request: {}", error.getMessage(), error);
+        log.error(LogMessages.HANDLER_ERROR, error.getMessage(), error);
         
         if (error instanceof com.crediya.solicitudes.model.exception.InvalidLoanApplicationException ||
             error instanceof com.crediya.solicitudes.model.exception.InvalidLoanTypeException) {
             return ServerResponse.badRequest()
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(java.util.Map.of("error", "Bad Request", "message", error.getMessage()));
+                    .bodyValue(java.util.Map.of("error", ErrorMessages.BAD_REQUEST, "message", error.getMessage()));
         }
         
         return ServerResponse.status(500)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(java.util.Map.of("error", "Internal Server Error", "message", "An unexpected error occurred"));
+                .bodyValue(java.util.Map.of("error", ErrorMessages.INTERNAL_SERVER_ERROR, "message", ErrorMessages.UNEXPECTED_ERROR));
     }
 }
