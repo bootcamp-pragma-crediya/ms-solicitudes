@@ -1,7 +1,9 @@
 package com.crediya.solicitudes.api.constants;
 
 public final class LogMessages {
-    private LogMessages() {}
+    private LogMessages() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     public static final String ERROR_BEAN_VALIDATION = "[Error] Bean validation: {}";
     public static final String ERROR_BAD_INPUT = "[Error] Bad input: {}";

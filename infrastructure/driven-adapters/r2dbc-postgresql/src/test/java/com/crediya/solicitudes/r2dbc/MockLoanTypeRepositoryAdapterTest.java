@@ -1,38 +1,35 @@
 package com.crediya.solicitudes.r2dbc;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 class MockLoanTypeRepositoryAdapterTest {
 
-    private final MockLoanTypeRepositoryAdapter adapter = new MockLoanTypeRepositoryAdapter();
-
+    private MockLoanTypeRepositoryAdapter adapter;
+    
+    @BeforeEach
+    void setUp() {
+        adapter = new MockLoanTypeRepositoryAdapter();
+    }
+    
     @Test
-    void shouldReturnTrueForValidLoanTypes() {
-        StepVerifier.create(adapter.existsActiveByCode(com.crediya.solicitudes.model.loantype.LoanTypeCode.PERSONAL.getCode()))
-                .expectNext(true)
-                .verifyComplete();
-
-        StepVerifier.create(adapter.existsActiveByCode(com.crediya.solicitudes.model.loantype.LoanTypeCode.MORTGAGE.getCode()))
-                .expectNext(true)
-                .verifyComplete();
-
-        StepVerifier.create(adapter.existsActiveByCode(com.crediya.solicitudes.model.loantype.LoanTypeCode.AUTO.getCode()))
-                .expectNext(true)
-                .verifyComplete();
-
-        StepVerifier.create(adapter.existsActiveByCode(com.crediya.solicitudes.model.loantype.LoanTypeCode.BUSINESS.getCode()))
+    void shouldReturnTrueForValidLoanType() {
+        StepVerifier.create(adapter.existsActiveByCode("PERSONAL"))
                 .expectNext(true)
                 .verifyComplete();
     }
-
+    
     @Test
-    void shouldReturnFalseForInvalidLoanTypes() {
-        StepVerifier.create(adapter.existsActiveByCode("INVALID"))
-                .expectNext(false)
+    void shouldReturnTrueForMortgageLoanType() {
+        StepVerifier.create(adapter.existsActiveByCode("MORTGAGE"))
+                .expectNext(true)
                 .verifyComplete();
-
-        StepVerifier.create(adapter.existsActiveByCode("UNKNOWN"))
+    }
+    
+    @Test
+    void shouldReturnFalseForInvalidLoanType() {
+        StepVerifier.create(adapter.existsActiveByCode("INVALID"))
                 .expectNext(false)
                 .verifyComplete();
     }

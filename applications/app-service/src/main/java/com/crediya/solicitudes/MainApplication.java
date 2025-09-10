@@ -3,15 +3,9 @@ package com.crediya.solicitudes;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
-import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 
-@SpringBootApplication(scanBasePackages = "com.crediya.solicitudes", exclude = {
-        org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration.class,
-        org.springframework.boot.autoconfigure.data.r2dbc.R2dbcDataAutoConfiguration.class,
-        org.springframework.boot.autoconfigure.r2dbc.R2dbcTransactionManagerAutoConfiguration.class
-})
+@SpringBootApplication(scanBasePackages = "com.crediya.solicitudes")
 @ConfigurationPropertiesScan
-@EnableR2dbcRepositories
 public class MainApplication {
     public static void main(String[] args) {
         SpringApplication.run(MainApplication.class, args);

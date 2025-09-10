@@ -9,11 +9,11 @@ spring:
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/crediya
     username: yulianaarangolopez
-    password: ""
-    initialization-mode: never
+    password:
   sql:
     init:
-      mode: never
+      mode: always
+      schema-locations: classpath:schema.sql
   h2:
     console:
       enabled: true
@@ -34,6 +34,9 @@ management:
 
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
+
+jwt:
+  secret: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQVNFU09SIiwidXNlcklkIjoiZDgwMDk2MmItYjczYi00OGUyLTk3MzgtNTBjMDQzYjdhNzFjIiwiZW1haWwiOiJudWV2b0BnbWFpbC5jb20iLCJzdWIiOiJudWV2b0BnbWFpbC5jb20iLCJpYXQiOjE3NTczODE3MjAsImV4cCI6MTc1NzQ2ODEyMH0.slQOQXKEIBYfF9EIBCHrL1UWVUEaqDdkbRqqVNtnSEY"
 
 app:
   mock-mode: false

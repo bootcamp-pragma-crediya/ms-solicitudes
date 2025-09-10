@@ -12,9 +12,14 @@ import java.time.OffsetDateTime;
 public class LoanApplication {
     String id;
     String customerDocument;
+    String email;
+    String customerName;
     BigDecimal amount;
     Integer termMonths;
     String loanType;
+    BigDecimal interestRate;
+    BigDecimal baseSalary;
+    BigDecimal monthlyPayment;
     LoanStatus status;
     OffsetDateTime createdAt;
 }

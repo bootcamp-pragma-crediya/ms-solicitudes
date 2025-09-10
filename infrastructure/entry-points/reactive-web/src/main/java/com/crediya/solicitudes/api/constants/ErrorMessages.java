@@ -1,7 +1,9 @@
 package com.crediya.solicitudes.api.constants;
 
 public final class ErrorMessages {
-    private ErrorMessages() {}
+    private ErrorMessages() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     public static final String VALIDATION_FAILED = "Validation failed";
     public static final String INVALID_INPUT = "Invalid input";

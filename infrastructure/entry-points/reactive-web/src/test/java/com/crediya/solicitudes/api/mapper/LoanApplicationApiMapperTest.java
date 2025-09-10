@@ -6,51 +6,65 @@ import com.crediya.solicitudes.model.loanapplication.LoanApplication;
 import com.crediya.solicitudes.model.loanstatus.LoanStatus;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LoanApplicationApiMapperTest {
 
     @Test
-    void shouldMapCreateLoanRequestToDomain() {
+    void shouldMapRequestToDomain() {
+        // Given
         CreateLoanRequestRequest request = new CreateLoanRequestRequest(
-                "12345678",
-                new BigDecimal("10000.00"),
-                12,
-                "PERSONAL"
-        );
-
+                "12345678", BigDecimal.valueOf(10000), 12, "PERSONAL");
+        
+        // When
         LoanApplication result = LoanApplicationApiMapper.toDomain(request);
-
-        assertEquals("12345678", result.getCustomerDocument());
-        assertEquals(new BigDecimal("10000.00"), result.getAmount());
-        assertEquals(12, result.getTermMonths());
-        assertEquals("PERSONAL", result.getLoanType());
+        
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getCustomerDocument()).isEqualTo("12345678");
+        assertThat(result.getAmount()).isEqualTo(BigDecimal.valueOf(10000));
+        assertThat(result.getTermMonths()).isEqualTo(12);
+        assertThat(result.getLoanType()).isEqualTo("PERSONAL");
     }
-
+    
     @Test
-    void shouldMapLoanApplicationToResponse() {
-        OffsetDateTime now = OffsetDateTime.now();
-        LoanApplication application = LoanApplication.builder()
-                .id("app-123")
-                .status(LoanStatus.PENDING_REVIEW)
+    void shouldMapDomainToResponse() {
+        // Given
+        LoanApplication app = LoanApplication.builder()
+                .id("1")
                 .customerDocument("12345678")
-                .amount(new BigDecimal("10000.00"))
+                .amount(BigDecimal.valueOf(10000))
                 .termMonths(12)
                 .loanType("PERSONAL")
-                .createdAt(now)
+                .status(LoanStatus.PENDING_REVIEW)
+                .createdAt(OffsetDateTime.now())
                 .build();
-
-        LoanApplicationResponse result = LoanApplicationApiMapper.toResponse(application);
-
-        assertEquals("app-123", result.id());
-        assertEquals("PENDING_REVIEW", result.status());
-        assertEquals("12345678", result.customerDocument());
-        assertEquals(new BigDecimal("10000.00"), result.amount());
-        assertEquals(12, result.termMonths());
-        assertEquals("PERSONAL", result.loanType());
-        assertEquals(now, result.createdAt());
+        
+        // When
+        LoanApplicationResponse result = LoanApplicationApiMapper.toResponse(app);
+        
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("1");
+        assertThat(result.customerDocument()).isEqualTo("12345678");
+        assertThat(result.amount()).isEqualTo(BigDecimal.valueOf(10000));
+        assertThat(result.termMonths()).isEqualTo(12);
+        assertThat(result.loanType()).isEqualTo("PERSONAL");
+        assertThat(result.status()).isEqualTo("PENDING_REVIEW");
+    }
+    
+    @Test
+    void shouldNotBeInstantiable() throws Exception {
+        Constructor<LoanApplicationApiMapper> constructor = LoanApplicationApiMapper.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        
+        assertThatThrownBy(constructor::newInstance)
+                .hasCauseInstanceOf(UnsupportedOperationException.class);
     }
 }

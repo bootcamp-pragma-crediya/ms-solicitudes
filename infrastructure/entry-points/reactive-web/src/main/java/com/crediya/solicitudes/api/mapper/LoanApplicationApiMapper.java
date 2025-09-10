@@ -5,7 +5,9 @@ import com.crediya.solicitudes.api.dto.LoanApplicationResponse;
 import com.crediya.solicitudes.model.loanapplication.LoanApplication;
 
 public final class LoanApplicationApiMapper {
-    private LoanApplicationApiMapper() {}
+    private LoanApplicationApiMapper() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     public static LoanApplication toDomain(CreateLoanRequestRequest dto) {
         return LoanApplication.builder()

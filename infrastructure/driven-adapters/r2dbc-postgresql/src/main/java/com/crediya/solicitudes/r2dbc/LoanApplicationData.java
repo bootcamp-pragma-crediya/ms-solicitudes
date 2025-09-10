@@ -9,7 +9,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -24,6 +24,11 @@ public class LoanApplicationData {
     @Column("user_id")
     private String customerDocument;
 
+    private String email;
+
+    @Column("customer_name")
+    private String customerName;
+
     private BigDecimal amount;
 
     @Column("term")
@@ -32,8 +37,17 @@ public class LoanApplicationData {
     @Column("loan_type")
     private String loanType;
 
+    @Column("interest_rate")
+    private BigDecimal interestRate;
+
+    @Column("base_salary")
+    private BigDecimal baseSalary;
+
+    @Column("monthly_payment")
+    private BigDecimal monthlyPayment;
+
     private String status;
 
     @Column("created_at")
-    private OffsetDateTime createdAt;
+    private LocalDateTime createdAt;
 }

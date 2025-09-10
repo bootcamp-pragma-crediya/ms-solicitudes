@@ -15,28 +15,34 @@ class LoanTypeRepositoryAdapterTest {
 
     @Mock
     private LoanTypeR2dbcRepository repository;
-
+    
     private LoanTypeRepositoryAdapter adapter;
-
+    
     @BeforeEach
     void setUp() {
         adapter = new LoanTypeRepositoryAdapter(repository);
     }
-
+    
     @Test
     void shouldReturnTrueWhenLoanTypeExists() {
-        when(repository.existsByCodeAndActiveTrue("PERSONAL")).thenReturn(Mono.just(true));
-
-        StepVerifier.create(adapter.existsActiveByCode("PERSONAL"))
+        // Given
+        String code = "PERSONAL";
+        when(repository.existsByCodeAndActiveTrue(code)).thenReturn(Mono.just(true));
+        
+        // When & Then
+        StepVerifier.create(adapter.existsActiveByCode(code))
                 .expectNext(true)
                 .verifyComplete();
     }
-
+    
     @Test
     void shouldReturnFalseWhenLoanTypeDoesNotExist() {
-        when(repository.existsByCodeAndActiveTrue("INVALID")).thenReturn(Mono.just(false));
-
-        StepVerifier.create(adapter.existsActiveByCode("INVALID"))
+        // Given
+        String code = "INVALID";
+        when(repository.existsByCodeAndActiveTrue(code)).thenReturn(Mono.just(false));
+        
+        // When & Then
+        StepVerifier.create(adapter.existsActiveByCode(code))
                 .expectNext(false)
                 .verifyComplete();
     }

@@ -6,6 +6,7 @@ import com.crediya.solicitudes.api.dto.CreateLoanRequestRequest;
 import com.crediya.solicitudes.api.dto.LoanApplicationResponse;
 import com.crediya.solicitudes.api.dto.LoanDtoMapper;
 import com.crediya.solicitudes.usecase.loanapplication.LoanApplicationUseCase;
+import com.crediya.solicitudes.usecase.loanapplication.ListLoanApplicationsUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -22,6 +23,7 @@ import java.net.URI;
 public class LoanApplicationHandler {
 
     private final LoanApplicationUseCase useCase;
+    private final ListLoanApplicationsUseCase listUseCase;
     private final LoanDtoMapper mapper;
 
     public Mono<ServerResponse> create(ServerRequest request) {
@@ -38,6 +40,25 @@ public class LoanApplicationHandler {
                 .map(mapper::toResponse)
                 .doOnSuccess(resp -> log.info(LogMessages.HANDLER_CREATED, resp.id(), resp.status()))
                 .flatMap(resp -> ServerResponse.created(URI.create("/api/v1/solicitud/" + resp.id()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(resp))
+                .onErrorResume(this::handleError);
+    }
+
+    public Mono<ServerResponse> list(ServerRequest request) {
+        int page = request.queryParam("page")
+                .map(Integer::parseInt)
+                .orElse(0);
+        int size = request.queryParam("size")
+                .map(Integer::parseInt)
+                .orElse(10);
+        
+        log.info("Listing loan applications for review - page: {}, size: {}", page, size);
+        
+        return listUseCase.execute(page, size)
+                .map(mapper::toPagedResponse)
+                .doOnSuccess(resp -> log.info("Retrieved {} applications for review", resp.content().size()))
+                .flatMap(resp -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(resp))
                 .onErrorResume(this::handleError);

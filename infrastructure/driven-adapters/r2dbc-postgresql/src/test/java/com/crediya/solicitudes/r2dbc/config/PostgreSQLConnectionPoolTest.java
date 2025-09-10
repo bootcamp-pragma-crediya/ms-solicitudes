@@ -1,37 +1,44 @@
 package com.crediya.solicitudes.r2dbc.config;
 
-import org.junit.jupiter.api.BeforeEach;
+import io.r2dbc.spi.ConnectionFactory;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class PostgreSQLConnectionPoolTest {
 
-    @InjectMocks
-    private PostgreSQLConnectionPool connectionPool;
-
-    @Mock
-    private PostgresqlConnectionProperties properties;
-
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        when(properties.host()).thenReturn("localhost");
-        when(properties.port()).thenReturn(5432);
-        when(properties.database()).thenReturn("dbName");
-        when(properties.schema()).thenReturn("schema");
-        when(properties.username()).thenReturn("username");
-        when(properties.password()).thenReturn("password");
-    }
-
     @Test
-    void connectionFactoryCreatedSuccessfully() {
-        assertNotNull(connectionPool.connectionFactory(properties));
+    void shouldCreateConnectionFactory() {
+        // Given
+        PostgreSQLConnectionPool config = new PostgreSQLConnectionPool();
+        PostgresqlConnectionProperties properties = new PostgresqlConnectionProperties(
+                "localhost", 5432, "testdb", "public", "user", "pass");
+        
+        // When
+        ConnectionFactory factory = config.connectionFactory(properties);
+        
+        // Then
+        assertThat(factory).isNotNull();
+    }
+    
+    @Test
+    void shouldCreateConnectionFactoryWithDefaults() {
+        // Given
+        PostgreSQLConnectionPool config = new PostgreSQLConnectionPool();
+        PostgresqlConnectionProperties properties = new PostgresqlConnectionProperties(
+                "localhost", null, "testdb", null, "user", "pass");
+        
+        // When
+        ConnectionFactory factory = config.connectionFactory(properties);
+        
+        // Then
+        assertThat(factory).isNotNull();
+    }
+    
+    @Test
+    void shouldHaveCorrectConstants() {
+        assertThat(PostgreSQLConnectionPool.INITIAL_SIZE).isEqualTo(12);
+        assertThat(PostgreSQLConnectionPool.MAX_SIZE).isEqualTo(15);
+        assertThat(PostgreSQLConnectionPool.MAX_IDLE_TIME_MINUTES).isEqualTo(30);
     }
 }
