@@ -3,6 +3,7 @@ package com.crediya.solicitudes.r2dbc;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.relational.core.mapping.Column;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ public class LoanApplicationWithUserData {
     private String userId;
     private String customerDocument;
     private BigDecimal amount;
+    @Column("term_months")
     private Integer termMonths;
     private String email;
     private String loanType;

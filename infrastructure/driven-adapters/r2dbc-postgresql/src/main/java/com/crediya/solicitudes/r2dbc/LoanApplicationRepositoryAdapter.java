@@ -77,20 +77,20 @@ public class LoanApplicationRepositoryAdapter
         
         log.info("[R2DBC-REAL] Finding applications by statuses={} page={} size={} offset={}", statusStrings, page, size, offset);
         
-        return repository.findByStatusInOrderByCreatedAtDesc(statusStrings, size, offset)
+        return repository.findByStatusInWithUserDataOrderByCreatedAtDesc(statusStrings, size, offset)
                 .doOnNext(data -> log.info("[R2DBC] Retrieved data: id={}, name='{}', salary={}, email={}", 
-                    data.getId(), data.getCustomerName(), data.getBaseSalary(), data.getEmail()))
+                    data.getId(), data.getUserName(), data.getUserBaseSalary(), data.getEmail()))
                 .map(data -> LoanApplication.builder()
                         .id(data.getId())
                         .userId(data.getUserId())
                         .customerDocument(data.getCustomerDocument())
                         .email(data.getEmail())
-                        .customerName(data.getCustomerName())
+                        .customerName(data.getUserName())
                         .amount(data.getAmount())
                         .termMonths(data.getTermMonths())
                         .loanType(data.getLoanType())
                         .interestRate(data.getInterestRate())
-                        .baseSalary(data.getBaseSalary())
+                        .baseSalary(data.getUserBaseSalary())
                         .monthlyPayment(data.getMonthlyPayment())
                         .status(LoanStatus.valueOf(data.getStatus()))
                         .createdAt(data.getCreatedAt() != null ? 

@@ -5,18 +5,15 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record LoanApplicationResponse(
+public record CreateLoanApplicationResponse(
         @JsonProperty("id") String id,
         @JsonProperty("email") String email,
         @JsonProperty("user_id") String userId,
         @JsonProperty("documento_cliente") String customerDocument,
         @JsonProperty("monto") BigDecimal amount,
         @JsonProperty("plazo") Integer termMonths,
-        @JsonProperty("nombre") String customerName,
         @JsonProperty("tipo_prestamo") String loanType,
-        @JsonProperty("estado_solicitud") String status,
-        @JsonProperty("salario_base") BigDecimal baseSalary
+        @JsonProperty("estado_solicitud") String status
 ) {}

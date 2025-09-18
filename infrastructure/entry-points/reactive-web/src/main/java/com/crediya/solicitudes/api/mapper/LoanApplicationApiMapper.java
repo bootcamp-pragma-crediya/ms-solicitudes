@@ -1,6 +1,7 @@
 package com.crediya.solicitudes.api.mapper;
 
 import com.crediya.solicitudes.api.dto.CreateLoanRequestRequest;
+import com.crediya.solicitudes.api.dto.CreateLoanApplicationResponse;
 import com.crediya.solicitudes.api.dto.LoanApplicationResponse;
 import com.crediya.solicitudes.model.loanapplication.LoanApplication;
 
@@ -19,21 +20,30 @@ public final class LoanApplicationApiMapper {
     }
 
     public static LoanApplicationResponse toResponse(LoanApplication app) {
-        System.out.println("[DEBUG] Mapping response - ID: " + app.getId());
-        System.out.println("[DEBUG] CreatedAt from domain: " + app.getCreatedAt());
-        
-        LoanApplicationResponse response = new LoanApplicationResponse(
+        return new LoanApplicationResponse(
                 app.getId(),
+                app.getEmail(),
                 app.getUserId(),
+                app.getCustomerDocument(),
+                app.getAmount(),
+                app.getTermMonths(),
+                app.getCustomerName(),
+                app.getLoanType(),
                 app.getStatus().name(),
+                app.getBaseSalary()
+        );
+    }
+
+    public static CreateLoanApplicationResponse toCreateResponse(LoanApplication app) {
+        return new CreateLoanApplicationResponse(
+                app.getId(),
+                app.getEmail(),
+                app.getUserId(),
                 app.getCustomerDocument(),
                 app.getAmount(),
                 app.getTermMonths(),
                 app.getLoanType(),
-                app.getCreatedAt() != null ? app.getCreatedAt() : java.time.OffsetDateTime.now()
+                app.getStatus().name()
         );
-        
-        System.out.println("[DEBUG] Response createdAt: " + response.createdAt());
-        return response;
     }
 }

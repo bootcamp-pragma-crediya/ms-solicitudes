@@ -5,6 +5,7 @@ import com.crediya.solicitudes.api.constants.LogMessages;
 import com.crediya.solicitudes.api.dto.CreateLoanRequestRequest;
 import com.crediya.solicitudes.api.dto.LoanApplicationResponse;
 import com.crediya.solicitudes.api.dto.LoanDtoMapper;
+import com.crediya.solicitudes.api.mapper.LoanApplicationApiMapper;
 import com.crediya.solicitudes.usecase.loanapplication.LoanApplicationUseCase;
 import com.crediya.solicitudes.usecase.loanapplication.ListLoanApplicationsUseCase;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +54,7 @@ public class LoanApplicationHandler {
                     return useCase.execute(domain, userId, userEmail);
                 })
                 .doOnNext(result -> log.info("[Handler] UseCase result: name={}, salary={}", result.getCustomerName(), result.getBaseSalary()))
-                .map(mapper::toResponse)
+                .map(LoanApplicationApiMapper::toCreateResponse)
                 .doOnSuccess(resp -> log.info(LogMessages.HANDLER_CREATED, resp.id(), resp.status()))
                 .flatMap(resp -> ServerResponse.created(URI.create("/api/v1/solicitud/" + resp.id()))
                         .contentType(MediaType.APPLICATION_JSON)
