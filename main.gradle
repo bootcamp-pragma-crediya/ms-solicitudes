@@ -85,6 +85,18 @@ subprojects {
         }
     }
 
+    jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                limit {
+                    minimum = 0.90
+                }
+            }
+        }
+    }
+
+    check.dependsOn jacocoTestCoverageVerification
+
 }
 
 jacoco {

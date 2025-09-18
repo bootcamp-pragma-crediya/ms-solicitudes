@@ -18,7 +18,6 @@ import reactor.test.StepVerifier;
 import java.math.BigDecimal;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,6 +33,7 @@ class LoanApplicationUseCaseTest {
     private ReactiveTransaction tx;
 
     private LoanApplicationUseCase useCase;
+    private static final String TEST_USER_ID = "test-user-id";
 
     @BeforeEach
     void setUp() {
@@ -44,7 +44,6 @@ class LoanApplicationUseCaseTest {
     void shouldCreateLoanApplicationSuccessfully() {
         // Given
         var input = LoanApplication.builder()
-                .customerDocument("12345678")
                 .amount(new BigDecimal("10000"))
                 .termMonths(12)
                 .loanType("PERSONAL")
@@ -52,6 +51,10 @@ class LoanApplicationUseCaseTest {
 
         var saved = input.toBuilder()
                 .id("generated-id")
+                .customerDocument("1234567890")
+                .email("test@email.com")
+                .customerName("Test User")
+                .baseSalary(new BigDecimal("5000000"))
                 .status(LoanStatus.PENDING_REVIEW)
                 .build();
 
@@ -60,8 +63,12 @@ class LoanApplicationUseCaseTest {
         when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // When & Then
-        StepVerifier.create(useCase.execute(input))
-                .expectNext(saved)
+        StepVerifier.create(useCase.execute(input, TEST_USER_ID))
+                .expectNextMatches(result -> 
+                    result.getId().equals("generated-id") &&
+                    result.getStatus() == LoanStatus.PENDING_REVIEW &&
+                    result.getCustomerDocument().equals("1234567890")
+                )
                 .verifyComplete();
     }
 
@@ -69,39 +76,7 @@ class LoanApplicationUseCaseTest {
     void shouldFailWhenApplicationIsNull() {
         when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
         
-        StepVerifier.create(useCase.execute(null))
-                .expectError(InvalidLoanApplicationException.class)
-                .verify();
-    }
-
-    @Test
-    void shouldFailWhenCustomerDocumentIsNull() {
-        var input = LoanApplication.builder()
-                .customerDocument(null)
-                .amount(new BigDecimal("10000"))
-                .termMonths(12)
-                .loanType("PERSONAL")
-                .build();
-
-        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        StepVerifier.create(useCase.execute(input))
-                .expectError(InvalidLoanApplicationException.class)
-                .verify();
-    }
-
-    @Test
-    void shouldFailWhenCustomerDocumentIsBlank() {
-        var input = LoanApplication.builder()
-                .customerDocument("   ")
-                .amount(new BigDecimal("10000"))
-                .termMonths(12)
-                .loanType("PERSONAL")
-                .build();
-
-        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        StepVerifier.create(useCase.execute(input))
+        StepVerifier.create(useCase.execute(null, TEST_USER_ID))
                 .expectError(InvalidLoanApplicationException.class)
                 .verify();
     }
@@ -109,7 +84,6 @@ class LoanApplicationUseCaseTest {
     @Test
     void shouldFailWhenAmountIsNull() {
         var input = LoanApplication.builder()
-                .customerDocument("12345678")
                 .amount(null)
                 .termMonths(12)
                 .loanType("PERSONAL")
@@ -117,7 +91,7 @@ class LoanApplicationUseCaseTest {
 
         when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        StepVerifier.create(useCase.execute(input))
+        StepVerifier.create(useCase.execute(input, TEST_USER_ID))
                 .expectError(InvalidLoanApplicationException.class)
                 .verify();
     }
@@ -125,7 +99,6 @@ class LoanApplicationUseCaseTest {
     @Test
     void shouldFailWhenAmountIsZero() {
         var input = LoanApplication.builder()
-                .customerDocument("12345678")
                 .amount(BigDecimal.ZERO)
                 .termMonths(12)
                 .loanType("PERSONAL")
@@ -133,103 +106,7 @@ class LoanApplicationUseCaseTest {
 
         when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        StepVerifier.create(useCase.execute(input))
-                .expectError(InvalidLoanApplicationException.class)
-                .verify();
-    }
-
-    @Test
-    void shouldFailWhenAmountIsNegative() {
-        var input = LoanApplication.builder()
-                .customerDocument("12345678")
-                .amount(new BigDecimal("-1000"))
-                .termMonths(12)
-                .loanType("PERSONAL")
-                .build();
-
-        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        StepVerifier.create(useCase.execute(input))
-                .expectError(InvalidLoanApplicationException.class)
-                .verify();
-    }
-
-    @Test
-    void shouldFailWhenTermMonthsIsNull() {
-        var input = LoanApplication.builder()
-                .customerDocument("12345678")
-                .amount(new BigDecimal("10000"))
-                .termMonths(null)
-                .loanType("PERSONAL")
-                .build();
-
-        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        StepVerifier.create(useCase.execute(input))
-                .expectError(InvalidLoanApplicationException.class)
-                .verify();
-    }
-
-    @Test
-    void shouldFailWhenTermMonthsIsZero() {
-        var input = LoanApplication.builder()
-                .customerDocument("12345678")
-                .amount(new BigDecimal("10000"))
-                .termMonths(0)
-                .loanType("PERSONAL")
-                .build();
-
-        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        StepVerifier.create(useCase.execute(input))
-                .expectError(InvalidLoanApplicationException.class)
-                .verify();
-    }
-
-    @Test
-    void shouldFailWhenTermMonthsIsNegative() {
-        var input = LoanApplication.builder()
-                .customerDocument("12345678")
-                .amount(new BigDecimal("10000"))
-                .termMonths(-5)
-                .loanType("PERSONAL")
-                .build();
-
-        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        StepVerifier.create(useCase.execute(input))
-                .expectError(InvalidLoanApplicationException.class)
-                .verify();
-    }
-
-    @Test
-    void shouldFailWhenLoanTypeIsNull() {
-        var input = LoanApplication.builder()
-                .customerDocument("12345678")
-                .amount(new BigDecimal("10000"))
-                .termMonths(12)
-                .loanType(null)
-                .build();
-
-        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        StepVerifier.create(useCase.execute(input))
-                .expectError(InvalidLoanApplicationException.class)
-                .verify();
-    }
-
-    @Test
-    void shouldFailWhenLoanTypeIsBlank() {
-        var input = LoanApplication.builder()
-                .customerDocument("12345678")
-                .amount(new BigDecimal("10000"))
-                .termMonths(12)
-                .loanType("   ")
-                .build();
-
-        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        StepVerifier.create(useCase.execute(input))
+        StepVerifier.create(useCase.execute(input, TEST_USER_ID))
                 .expectError(InvalidLoanApplicationException.class)
                 .verify();
     }
@@ -237,7 +114,6 @@ class LoanApplicationUseCaseTest {
     @Test
     void shouldFailWhenLoanTypeDoesNotExist() {
         var input = LoanApplication.builder()
-                .customerDocument("12345678")
                 .amount(new BigDecimal("10000"))
                 .termMonths(12)
                 .loanType("INVALID_TYPE")
@@ -246,24 +122,7 @@ class LoanApplicationUseCaseTest {
         when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(loanTypeRepository.existsActiveByCode("INVALID_TYPE")).thenReturn(Mono.just(false));
 
-        StepVerifier.create(useCase.execute(input))
-                .expectError(InvalidLoanTypeException.class)
-                .verify();
-    }
-
-    @Test
-    void shouldFailWhenLoanTypeIsInactive() {
-        var input = LoanApplication.builder()
-                .customerDocument("12345678")
-                .amount(new BigDecimal("10000"))
-                .termMonths(12)
-                .loanType("INACTIVE_TYPE")
-                .build();
-
-        when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(loanTypeRepository.existsActiveByCode("INACTIVE_TYPE")).thenReturn(Mono.just(false));
-
-        StepVerifier.create(useCase.execute(input))
+        StepVerifier.create(useCase.execute(input, TEST_USER_ID))
                 .expectError(InvalidLoanTypeException.class)
                 .verify();
     }

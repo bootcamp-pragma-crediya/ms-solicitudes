@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: ${SERVER_PORT:8082}
 
 spring:
   application:
@@ -7,9 +7,9 @@ spring:
   devtools:
     add-properties: false
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/crediya
-    username: yulianaarangolopez
-    password:
+    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:crediya_solicitudes}
+    username: ${DB_USERNAME:yulianaarangolopez}
+    password: ${DB_PASSWORD:}
   sql:
     init:
       mode: always
@@ -43,15 +43,19 @@ app:
 
 adapters:
   r2dbc:
-    host: localhost
-    port: 5432
-    database: crediya
+    host: ${DB_HOST:localhost}
+    port: ${DB_PORT:5432}
+    database: ${DB_NAME:crediya_solicitudes}
     schema: public
-    username: yulianaarangolopez
-    password: ""
+    username: ${DB_USERNAME:yulianaarangolopez}
+    password: ${DB_PASSWORD:}
     initial-size: 2
     max-size: 10
     max-idle-time: 30s
+
+auth:
+  service:
+    url: ${AUTH_SERVICE_URL:http://localhost:8080}
 
 springdoc:
   swagger-ui:

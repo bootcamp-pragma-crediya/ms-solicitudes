@@ -10,8 +10,9 @@ import java.time.OffsetDateTime;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record LoanApplicationResponse(
         @JsonProperty("id") String id,
+        @JsonProperty("user_id") String userId,
         @JsonProperty("status") String status,
-        @JsonProperty("user_id") String customerDocument,
+        @JsonProperty("customer_document") String customerDocument,
         @JsonProperty("amount") BigDecimal amount,
         @JsonProperty("term_months") Integer termMonths,
         @JsonProperty("loan_type") String loanType,

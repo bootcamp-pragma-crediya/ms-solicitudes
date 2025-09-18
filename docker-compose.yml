@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # Base de datos para Autenticación
+  db-autenticacion:
+    image: postgres:15-alpine
+    container_name: crediya-db-autenticacion
+    environment:
+      POSTGRES_DB: crediya_autenticacion
+      POSTGRES_USER: crediya_user
+      POSTGRES_PASSWORD: crediya_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_autenticacion_data:/var/lib/postgresql/data
+      - ./init-scripts/init-autenticacion.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - crediya-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crediya_user -d crediya_autenticacion"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Base de datos para Solicitudes
+  db-solicitudes:
+    image: postgres:15-alpine
+    container_name: crediya-db-solicitudes
+    environment:
+      POSTGRES_DB: crediya_solicitudes
+      POSTGRES_USER: crediya_user
+      POSTGRES_PASSWORD: crediya_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - db_solicitudes_data:/var/lib/postgresql/data
+      - ./init-scripts/init-solicitudes.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - crediya-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crediya_user -d crediya_solicitudes"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Microservicio de Autenticación
+  ms-autenticacion:
+    build:
+      context: /Users/yulianaarangolopez/Downloads/ms-autenticacion
+      dockerfile: deployment/Dockerfile
+    container_name: crediya-ms-autenticacion
+    environment:
+      SERVER_PORT: 8080
+      DB_HOST: db-autenticacion
+      DB_PORT: 5432
+      DB_NAME: crediya_autenticacion
+      DB_USERNAME: crediya_user
+      DB_PASSWORD: crediya_pass
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_SQL_INIT_MODE: never
+    ports:
+      - "8080:8080"
+    depends_on:
+      db-autenticacion:
+        condition: service_healthy
+    networks:
+      - crediya-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+  # Microservicio de Solicitudes
+  ms-solicitudes:
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile
+    container_name: crediya-ms-solicitudes
+    environment:
+      SERVER_PORT: 8082
+      DB_HOST: db-solicitudes
+      DB_PORT: 5432
+      DB_NAME: crediya_solicitudes
+      DB_USERNAME: crediya_user
+      DB_PASSWORD: crediya_pass
+      AUTH_SERVICE_URL: http://ms-autenticacion:8080
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8082:8082"
+    depends_on:
+      db-solicitudes:
+        condition: service_healthy
+      ms-autenticacion:
+        condition: service_healthy
+    networks:
+      - crediya-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/api/v1/solicitud"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+networks:
+  crediya-network:
+    driver: bridge
+    name: crediya-network
+
+volumes:
+  db_autenticacion_data:
+    name: crediya_db_autenticacion_data
+  db_solicitudes_data:
+    name: crediya_db_solicitudes_data

@@ -1,6 +1,5 @@
 package com.crediya.solicitudes.api.config;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -25,33 +24,64 @@ class SecurityHeadersConfigTest {
     
     @Mock
     private ServerHttpResponse response;
-    
-    @Mock
-    private HttpHeaders headers;
-    
-    private SecurityHeadersConfig filter;
-    
-    @BeforeEach
-    void setUp() {
-        filter = new SecurityHeadersConfig();
+
+    @Test
+    void shouldAddSecurityHeaders() {
+        SecurityHeadersConfig filter = new SecurityHeadersConfig();
+        HttpHeaders headers = new HttpHeaders();
+        
         when(exchange.getResponse()).thenReturn(response);
         when(response.getHeaders()).thenReturn(headers);
         when(chain.filter(exchange)).thenReturn(Mono.empty());
-    }
-    
-    @Test
-    void shouldAddSecurityHeaders() {
-        // When & Then
-        StepVerifier.create(filter.filter(exchange, chain))
+
+        Mono<Void> result = filter.filter(exchange, chain);
+
+        StepVerifier.create(result)
                 .verifyComplete();
-        
-        verify(headers).set("Content-Security-Policy", "default-src 'self'; frame-ancestors 'self'; form-action 'self'");
-        verify(headers).set("Strict-Transport-Security", "max-age=31536000;");
-        verify(headers).set("X-Content-Type-Options", "nosniff");
-        verify(headers).set("Server", "");
-        verify(headers).set("Cache-Control", "no-store");
-        verify(headers).set("Pragma", "no-cache");
-        verify(headers).set("Referrer-Policy", "strict-origin-when-cross-origin");
+
         verify(chain).filter(exchange);
+        
+        // Verify security headers were set
+        assert headers.containsKey("Content-Security-Policy");
+        assert headers.containsKey("Strict-Transport-Security");
+        assert headers.containsKey("X-Content-Type-Options");
+        assert headers.containsKey("Server");
+        assert headers.containsKey("Cache-Control");
+        assert headers.containsKey("Pragma");
+        assert headers.containsKey("Referrer-Policy");
+    }
+
+    @Test
+    void shouldSetCorrectHeaderValues() {
+        SecurityHeadersConfig filter = new SecurityHeadersConfig();
+        HttpHeaders headers = new HttpHeaders();
+        
+        when(exchange.getResponse()).thenReturn(response);
+        when(response.getHeaders()).thenReturn(headers);
+        when(chain.filter(exchange)).thenReturn(Mono.empty());
+
+        filter.filter(exchange, chain).block();
+
+        assert "default-src 'self'; frame-ancestors 'self'; form-action 'self'".equals(headers.getFirst("Content-Security-Policy"));
+        assert "max-age=31536000;".equals(headers.getFirst("Strict-Transport-Security"));
+        assert "nosniff".equals(headers.getFirst("X-Content-Type-Options"));
+        assert "".equals(headers.getFirst("Server"));
+        assert "no-store".equals(headers.getFirst("Cache-Control"));
+        assert "no-cache".equals(headers.getFirst("Pragma"));
+        assert "strict-origin-when-cross-origin".equals(headers.getFirst("Referrer-Policy"));
+    }
+
+    @Test
+    void shouldCallNextFilter() {
+        SecurityHeadersConfig filter = new SecurityHeadersConfig();
+        HttpHeaders headers = new HttpHeaders();
+        
+        when(exchange.getResponse()).thenReturn(response);
+        when(response.getHeaders()).thenReturn(headers);
+        when(chain.filter(exchange)).thenReturn(Mono.empty());
+
+        filter.filter(exchange, chain).block();
+
+        verify(chain, times(1)).filter(exchange);
     }
 }

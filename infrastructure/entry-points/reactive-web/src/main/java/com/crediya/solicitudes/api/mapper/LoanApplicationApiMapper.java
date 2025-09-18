@@ -11,22 +11,29 @@ public final class LoanApplicationApiMapper {
 
     public static LoanApplication toDomain(CreateLoanRequestRequest dto) {
         return LoanApplication.builder()
-                .customerDocument(dto.customerDocument())
                 .amount(dto.amount())
                 .termMonths(dto.termMonths())
                 .loanType(dto.loanType())
+                .customerDocument(dto.customerDocument())
                 .build();
     }
 
     public static LoanApplicationResponse toResponse(LoanApplication app) {
-        return new LoanApplicationResponse(
+        System.out.println("[DEBUG] Mapping response - ID: " + app.getId());
+        System.out.println("[DEBUG] CreatedAt from domain: " + app.getCreatedAt());
+        
+        LoanApplicationResponse response = new LoanApplicationResponse(
                 app.getId(),
+                app.getUserId(),
                 app.getStatus().name(),
                 app.getCustomerDocument(),
                 app.getAmount(),
                 app.getTermMonths(),
                 app.getLoanType(),
-                app.getCreatedAt()
+                app.getCreatedAt() != null ? app.getCreatedAt() : java.time.OffsetDateTime.now()
         );
+        
+        System.out.println("[DEBUG] Response createdAt: " + response.createdAt());
+        return response;
     }
 }

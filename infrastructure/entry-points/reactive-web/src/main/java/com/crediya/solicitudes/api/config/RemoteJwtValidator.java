@@ -14,7 +14,7 @@ public class RemoteJwtValidator {
 
     private final WebClient webClient;
 
-    public RemoteJwtValidator(@Value("${ms-autenticacion.url:http://localhost:8080}") String authServiceUrl) {
+    public RemoteJwtValidator(@Value("${auth.service.url:http://localhost:8080}") String authServiceUrl) {
         this.webClient = WebClient.builder()
                 .baseUrl(authServiceUrl)
                 .build();

@@ -1,0 +1,71 @@
+server:
+  port: ${SERVER_PORT:8082}
+
+spring:
+  application:
+    name: "ms-solicitudes"
+  devtools:
+    add-properties: false
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST:db-solicitudes}:${DB_PORT:5432}/${DB_NAME:crediya_solicitudes}
+    username: ${DB_USERNAME:crediya_user}
+    password: ${DB_PASSWORD:crediya_pass}
+    pool:
+      enabled: true
+      initial-size: 5
+      max-size: 20
+      max-idle-time: 30m
+      max-life-time: 60m
+      max-acquire-time: 60s
+      max-create-connection-time: 60s
+      validation-query: SELECT 1
+  sql:
+    init:
+      mode: never
+
+  jackson:
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,prometheus"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+cors:
+  allowed-origins: "http://localhost:4200,http://localhost:8080"
+
+jwt:
+  secret: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQVNFU09SIiwidXNlcklkIjoiZDgwMDk2MmItYjczYi00OGUyLTk3MzgtNTBjMDQzYjdhNzFjIiwiZW1haWwiOiJudWV2b0BnbWFpbC5jb20iLCJzdWIiOiJudWV2b0BnbWFpbC5jb20iLCJpYXQiOjE3NTczODE3MjAsImV4cCI6MTc1NzQ2ODEyMH0.slQOQXKEIBYfF9EIBCHrL1UWVUEaqDdkbRqqVNtnSEY"
+
+app:
+  mock-mode: false
+
+adapters:
+  r2dbc:
+    host: ${DB_HOST:db-solicitudes}
+    port: ${DB_PORT:5432}
+    database: ${DB_NAME:crediya_solicitudes}
+    schema: public
+    username: ${DB_USERNAME:crediya_user}
+    password: ${DB_PASSWORD:crediya_pass}
+    initial-size: 2
+    max-size: 10
+    max-idle-time: 30s
+
+auth:
+  service:
+    url: ${AUTH_SERVICE_URL:http://ms-autenticacion:8080}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tryItOutEnabled: true
+
+logging:
+  level:
+    com.crediya.solicitudes: DEBUG
+    root: INFO

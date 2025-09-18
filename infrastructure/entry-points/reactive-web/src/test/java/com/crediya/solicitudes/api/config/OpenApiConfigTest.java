@@ -3,23 +3,34 @@ package com.crediya.solicitudes.api.config;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 class OpenApiConfigTest {
 
     @Test
     void shouldCreateOpenAPI() {
-        // Given
         OpenApiConfig config = new OpenApiConfig();
         
-        // When
         OpenAPI openAPI = config.openAPI();
         
-        // Then
-        assertThat(openAPI).isNotNull();
-        assertThat(openAPI.getInfo()).isNotNull();
-        assertThat(openAPI.getInfo().getTitle()).isEqualTo("Loan Applications API");
-        assertThat(openAPI.getInfo().getVersion()).isEqualTo("v1");
-        assertThat(openAPI.getInfo().getDescription()).isEqualTo("Endpoints for loan application requests");
+        assertNotNull(openAPI);
+        assertNotNull(openAPI.getInfo());
+        assertEquals("Loan Applications API", openAPI.getInfo().getTitle());
+        assertEquals("v1", openAPI.getInfo().getVersion());
+        assertEquals("Endpoints for loan application requests", openAPI.getInfo().getDescription());
+    }
+
+    @Test
+    void shouldHaveCorrectApiInfo() {
+        OpenApiConfig config = new OpenApiConfig();
+        
+        OpenAPI openAPI = config.openAPI();
+        
+        assertNotNull(openAPI.getInfo().getTitle());
+        assertNotNull(openAPI.getInfo().getVersion());
+        assertNotNull(openAPI.getInfo().getDescription());
+        assertFalse(openAPI.getInfo().getTitle().isEmpty());
+        assertFalse(openAPI.getInfo().getVersion().isEmpty());
+        assertFalse(openAPI.getInfo().getDescription().isEmpty());
     }
 }

@@ -27,16 +27,32 @@ public class LoanApplicationHandler {
     private final LoanDtoMapper mapper;
 
     public Mono<ServerResponse> create(ServerRequest request) {
+        String userId = request.headers().firstHeader("X-User-Id");
+        
+        if (userId == null || userId.isBlank()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(java.util.Map.of("error", "Usuario no autenticado"));
+        }
+        
+        String userEmail = (String) request.exchange().getAttributes().get("user.email");
+        log.info("[Handler] User email from JWT: {}, userId: {}", userEmail, userId);
+        
         return request.bodyToMono(CreateLoanRequestRequest.class)
-                .doOnNext(req -> log.info(LogMessages.HANDLER_POST_REQUEST,
-                        req.customerDocument(), req.loanType(), req.amount(), req.termMonths()))
+                .doOnNext(req -> log.info("[Handler] POST request: userId={}, doc={}, amount={}, term={}",
+                        userId, req.customerDocument(), req.amount(), req.termMonths()))
                 .flatMap(req -> {
                     var domain = mapper.toDomain(req);
+                    log.info("[Handler] Mapped domain: {}", domain);
                     return domain != null ? Mono.just(domain) : 
                            Mono.error(new com.crediya.solicitudes.model.exception.InvalidLoanApplicationException(
                                com.crediya.solicitudes.model.exception.ValidationMessage.BODY_REQUIRED.getMessage()));
                 })
-                .flatMap(useCase::execute)
+                .flatMap(domain -> {
+                    log.info("[Handler] Calling useCase.execute");
+                    return useCase.execute(domain, userId, userEmail);
+                })
+                .doOnNext(result -> log.info("[Handler] UseCase result: name={}, salary={}", result.getCustomerName(), result.getBaseSalary()))
                 .map(mapper::toResponse)
                 .doOnSuccess(resp -> log.info(LogMessages.HANDLER_CREATED, resp.id(), resp.status()))
                 .flatMap(resp -> ServerResponse.created(URI.create("/api/v1/solicitud/" + resp.id()))
@@ -56,8 +72,17 @@ public class LoanApplicationHandler {
         log.info("Listing loan applications for review - page: {}, size: {}", page, size);
         
         return listUseCase.execute(page, size)
-                .map(mapper::toPagedResponse)
-                .doOnSuccess(resp -> log.info("Retrieved {} applications for review", resp.content().size()))
+                .map(result -> {
+                    var apps = mapper.toListResponse(result.getContent());
+                    log.info("Retrieved {} applications for review", apps.size());
+                    return java.util.Map.of(
+                        "content", apps,
+                        "page", result.getPage(),
+                        "size", result.getSize(),
+                        "total_elements", result.getTotalElements(),
+                        "total_pages", result.getTotalPages()
+                    );
+                })
                 .flatMap(resp -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(resp))
@@ -72,6 +97,13 @@ public class LoanApplicationHandler {
             return ServerResponse.badRequest()
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(java.util.Map.of("error", ErrorMessages.BAD_REQUEST, "message", error.getMessage()));
+        }
+        
+        if (error instanceof com.fasterxml.jackson.core.JsonProcessingException) {
+            log.error("JSON serialization error: {}", error.getMessage());
+            return ServerResponse.status(500)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(java.util.Map.of("error", "SERIALIZATION_ERROR", "message", "Error processing response"));
         }
         
         return ServerResponse.status(500)

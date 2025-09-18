@@ -17,6 +17,7 @@ public interface LoanDtoMapper {
     @Mapping(target = "interestRate", ignore = true)
     @Mapping(target = "baseSalary", ignore = true)
     @Mapping(target = "monthlyPayment", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     LoanApplication toDomain(CreateLoanRequestRequest request);
     
     LoanApplicationResponse toResponse(LoanApplication app);
@@ -25,8 +26,8 @@ public interface LoanDtoMapper {
     
     List<LoanApplicationListResponse> toListResponse(List<LoanApplication> apps);
     
-    default PagedResponse<LoanApplicationListResponse> toPagedResponse(ListLoanApplicationsUseCase.PagedResult<LoanApplication> pagedResult) {
-        return new PagedResponse<>(
+    default PagedResponseClass<LoanApplicationListResponse> toPagedResponse(ListLoanApplicationsUseCase.PagedResult<LoanApplication> pagedResult) {
+        return new PagedResponseClass<>(
             toListResponse(pagedResult.getContent()),
             pagedResult.getPage(),
             pagedResult.getSize(),

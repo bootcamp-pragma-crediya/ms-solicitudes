@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 @Builder(toBuilder = true)
 public class LoanApplication {
     String id;
+    String userId;
     String customerDocument;
     String email;
     String customerName;

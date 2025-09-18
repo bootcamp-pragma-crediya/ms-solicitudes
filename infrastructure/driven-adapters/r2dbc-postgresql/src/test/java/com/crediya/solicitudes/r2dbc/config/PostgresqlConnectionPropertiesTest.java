@@ -2,60 +2,75 @@ package com.crediya.solicitudes.r2dbc.config;
 
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PostgresqlConnectionPropertiesTest {
 
     @Test
-    void shouldCreatePropertiesWithAllFields() {
-        // Given
-        String host = "localhost";
-        Integer port = 5432;
-        String database = "testdb";
-        String schema = "public";
-        String username = "user";
-        String password = "pass";
-        
-        // When
+    void shouldCreateConnectionProperties() {
         PostgresqlConnectionProperties properties = new PostgresqlConnectionProperties(
-                host, port, database, schema, username, password);
-        
-        // Then
-        assertThat(properties.host()).isEqualTo(host);
-        assertThat(properties.port()).isEqualTo(port);
-        assertThat(properties.database()).isEqualTo(database);
-        assertThat(properties.schema()).isEqualTo(schema);
-        assertThat(properties.username()).isEqualTo(username);
-        assertThat(properties.password()).isEqualTo(password);
+                "localhost", 5432, "testdb", "public", "user", "password"
+        );
+
+        assertEquals("localhost", properties.host());
+        assertEquals(5432, properties.port());
+        assertEquals("testdb", properties.database());
+        assertEquals("public", properties.schema());
+        assertEquals("user", properties.username());
+        assertEquals("password", properties.password());
     }
-    
+
     @Test
     void shouldSupportEqualsAndHashCode() {
-        // Given
         PostgresqlConnectionProperties props1 = new PostgresqlConnectionProperties(
-                "localhost", 5432, "testdb", "public", "user", "pass");
+                "localhost", 5432, "testdb", "public", "user", "password"
+        );
         PostgresqlConnectionProperties props2 = new PostgresqlConnectionProperties(
-                "localhost", 5432, "testdb", "public", "user", "pass");
-        
-        // Then
-        assertThat(props1).isEqualTo(props2);
-        assertThat(props1.hashCode()).isEqualTo(props2.hashCode());
+                "localhost", 5432, "testdb", "public", "user", "password"
+        );
+
+        assertEquals(props1, props2);
+        assertEquals(props1.hashCode(), props2.hashCode());
     }
-    
+
     @Test
     void shouldSupportToString() {
-        // Given
         PostgresqlConnectionProperties properties = new PostgresqlConnectionProperties(
-                "localhost", 5432, "testdb", "public", "user", "pass");
-        
-        // When
-        String result = properties.toString();
-        
-        // Then
-        assertThat(result).contains("localhost");
-        assertThat(result).contains("5432");
-        assertThat(result).contains("testdb");
-        assertThat(result).contains("public");
-        assertThat(result).contains("user");
+                "localhost", 5432, "testdb", "public", "user", "password"
+        );
+
+        String toString = properties.toString();
+        assertNotNull(toString);
+        assertTrue(toString.contains("localhost"));
+        assertTrue(toString.contains("5432"));
+        assertTrue(toString.contains("testdb"));
+    }
+
+    @Test
+    void shouldHandleNullValues() {
+        PostgresqlConnectionProperties properties = new PostgresqlConnectionProperties(
+                null, null, null, null, null, null
+        );
+
+        assertNull(properties.host());
+        assertNull(properties.port());
+        assertNull(properties.database());
+        assertNull(properties.schema());
+        assertNull(properties.username());
+        assertNull(properties.password());
+    }
+
+    @Test
+    void shouldCreateWithDifferentPorts() {
+        PostgresqlConnectionProperties props1 = new PostgresqlConnectionProperties(
+                "localhost", 5432, "db", "schema", "user", "pass"
+        );
+        PostgresqlConnectionProperties props2 = new PostgresqlConnectionProperties(
+                "localhost", 3306, "db", "schema", "user", "pass"
+        );
+
+        assertNotEquals(props1, props2);
+        assertEquals(5432, props1.port());
+        assertEquals(3306, props2.port());
     }
 }

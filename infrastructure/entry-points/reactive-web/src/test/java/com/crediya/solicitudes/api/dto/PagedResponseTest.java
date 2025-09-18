@@ -2,73 +2,83 @@ package com.crediya.solicitudes.api.dto;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PagedResponseTest {
 
     @Test
-    void shouldCreatePagedResponseWithAllFields() {
-        // Given
-        List<String> content = List.of("item1", "item2");
-        int page = 0;
-        int size = 10;
-        long totalElements = 2L;
-        int totalPages = 1;
-        
-        // When
-        PagedResponse<String> response = new PagedResponse<>(content, page, size, totalElements, totalPages);
-        
-        // Then
-        assertThat(response.content()).isEqualTo(content);
-        assertThat(response.page()).isEqualTo(page);
-        assertThat(response.size()).isEqualTo(size);
-        assertThat(response.totalElements()).isEqualTo(totalElements);
-        assertThat(response.totalPages()).isEqualTo(totalPages);
+    void shouldCreatePagedResponse() {
+        List<String> content = Arrays.asList("item1", "item2", "item3");
+        PagedResponse<String> response = new PagedResponse<>(content, 0, 10, 3L, 1);
+
+        assertEquals(content, response.content());
+        assertEquals(0, response.page());
+        assertEquals(10, response.size());
+        assertEquals(3L, response.totalElements());
+        assertEquals(1, response.totalPages());
     }
-    
+
+    @Test
+    void shouldCreateEmptyPagedResponse() {
+        List<String> content = Collections.emptyList();
+        PagedResponse<String> response = new PagedResponse<>(content, 0, 10, 0L, 0);
+
+        assertTrue(response.content().isEmpty());
+        assertEquals(0, response.page());
+        assertEquals(10, response.size());
+        assertEquals(0L, response.totalElements());
+        assertEquals(0, response.totalPages());
+    }
+
     @Test
     void shouldSupportEqualsAndHashCode() {
-        // Given
-        List<String> content = List.of("item1", "item2");
-        PagedResponse<String> response1 = new PagedResponse<>(content, 0, 10, 2L, 1);
-        PagedResponse<String> response2 = new PagedResponse<>(content, 0, 10, 2L, 1);
-        
-        // Then
-        assertThat(response1).isEqualTo(response2);
-        assertThat(response1.hashCode()).isEqualTo(response2.hashCode());
+        List<String> content = Arrays.asList("item1", "item2");
+        PagedResponse<String> response1 = new PagedResponse<>(content, 1, 5, 10L, 2);
+        PagedResponse<String> response2 = new PagedResponse<>(content, 1, 5, 10L, 2);
+
+        assertEquals(response1, response2);
+        assertEquals(response1.hashCode(), response2.hashCode());
     }
-    
+
     @Test
     void shouldSupportToString() {
-        // Given
-        List<String> content = List.of("item1", "item2");
-        PagedResponse<String> response = new PagedResponse<>(content, 0, 10, 2L, 1);
-        
-        // When
-        String result = response.toString();
-        
-        // Then
-        assertThat(result).contains("item1");
-        assertThat(result).contains("item2");
-        assertThat(result).contains("0");
-        assertThat(result).contains("10");
-        assertThat(result).contains("2");
-        assertThat(result).contains("1");
+        List<Integer> content = Arrays.asList(1, 2, 3);
+        PagedResponse<Integer> response = new PagedResponse<>(content, 2, 3, 9L, 3);
+
+        String toString = response.toString();
+        assertNotNull(toString);
+        assertTrue(toString.contains("content"));
+        assertTrue(toString.contains("page"));
+        assertTrue(toString.contains("size"));
     }
-    
+
     @Test
-    void shouldHandleEmptyContent() {
-        // Given
-        List<String> content = List.of();
-        
-        // When
-        PagedResponse<String> response = new PagedResponse<>(content, 0, 10, 0L, 0);
-        
-        // Then
-        assertThat(response.content()).isEmpty();
-        assertThat(response.totalElements()).isEqualTo(0L);
-        assertThat(response.totalPages()).isEqualTo(0);
+    void shouldHandleNullContent() {
+        PagedResponse<String> response = new PagedResponse<>(null, 0, 10, 0L, 0);
+
+        assertNull(response.content());
+        assertEquals(0, response.page());
+        assertEquals(10, response.size());
+        assertEquals(0L, response.totalElements());
+        assertEquals(0, response.totalPages());
+    }
+
+    @Test
+    void shouldWorkWithDifferentTypes() {
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+        PagedResponse<Integer> numberResponse = new PagedResponse<>(numbers, 0, 5, 5L, 1);
+
+        assertEquals(numbers, numberResponse.content());
+        assertEquals(5, numberResponse.content().size());
+
+        List<Boolean> booleans = Arrays.asList(true, false);
+        PagedResponse<Boolean> booleanResponse = new PagedResponse<>(booleans, 1, 2, 4L, 2);
+
+        assertEquals(booleans, booleanResponse.content());
+        assertEquals(2, booleanResponse.content().size());
     }
 }

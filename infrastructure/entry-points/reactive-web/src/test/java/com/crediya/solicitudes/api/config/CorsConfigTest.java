@@ -3,33 +3,47 @@ package com.crediya.solicitudes.api.config;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CorsConfigTest {
 
     @Test
     void shouldCreateCorsWebFilter() {
-        // Given
-        CorsConfig config = new CorsConfig();
-        String origins = "http://localhost:3000,http://localhost:8080";
+        CorsConfig corsConfig = new CorsConfig();
+        String origins = "http://localhost:3000,https://example.com";
         
-        // When
-        CorsWebFilter filter = config.corsWebFilter(origins);
+        CorsWebFilter filter = corsConfig.corsWebFilter(origins);
         
-        // Then
-        assertThat(filter).isNotNull();
+        assertNotNull(filter);
     }
-    
+
     @Test
     void shouldCreateCorsWebFilterWithSingleOrigin() {
-        // Given
-        CorsConfig config = new CorsConfig();
+        CorsConfig corsConfig = new CorsConfig();
         String origins = "http://localhost:3000";
         
-        // When
-        CorsWebFilter filter = config.corsWebFilter(origins);
+        CorsWebFilter filter = corsConfig.corsWebFilter(origins);
         
-        // Then
-        assertThat(filter).isNotNull();
+        assertNotNull(filter);
+    }
+
+    @Test
+    void shouldCreateCorsWebFilterWithEmptyOrigin() {
+        CorsConfig corsConfig = new CorsConfig();
+        String origins = "";
+        
+        CorsWebFilter filter = corsConfig.corsWebFilter(origins);
+        
+        assertNotNull(filter);
+    }
+
+    @Test
+    void shouldCreateCorsWebFilterWithMultipleOrigins() {
+        CorsConfig corsConfig = new CorsConfig();
+        String origins = "http://localhost:3000,https://app.example.com,https://admin.example.com";
+        
+        CorsWebFilter filter = corsConfig.corsWebFilter(origins);
+        
+        assertNotNull(filter);
     }
 }

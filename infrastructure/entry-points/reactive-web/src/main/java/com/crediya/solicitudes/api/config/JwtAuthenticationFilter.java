@@ -55,9 +55,10 @@ public class JwtAuthenticationFilter implements WebFilter {
             String payload = new String(java.util.Base64.getUrlDecoder().decode(parts[1]));
             log.info("JWT payload: {}", payload);
             
-            // Parse JSON manually to extract role
+            // Parse JSON manually to extract role, email and userId
             String role = extractJsonValue(payload, "role");
             String email = extractJsonValue(payload, "email");
+            String userId = extractJsonValue(payload, "userId");
             
             if (path.equals("/api/v1/solicitud") && "GET".equals(exchange.getRequest().getMethod().name())) {
                 if (!"ASESOR".equals(role)) {
@@ -66,16 +67,31 @@ public class JwtAuthenticationFilter implements WebFilter {
                 }
             }
             
+            if (path.equals("/api/v1/solicitud") && "POST".equals(exchange.getRequest().getMethod().name())) {
+                if (!"CLIENTE".equals(role)) {
+                    log.warn("Access denied for role: {} on POST solicitud. Only CLIENTE can create requests", role);
+                    return forbidden(exchange);
+                }
+            }
+            
+            // Add userId to request headers for handler access
+            ServerWebExchange modifiedExchange = exchange.mutate()
+                .request(exchange.getRequest().mutate()
+                    .header("X-User-Id", userId)
+                    .build())
+                .build();
+            
             exchange.getAttributes().put("user.email", email);
             exchange.getAttributes().put("user.role", role);
-            log.info("JWT validated successfully for user: {}, role: {}", email, role);
+            exchange.getAttributes().put("user.id", userId);
+            log.info("JWT validated successfully for user: {}, role: {}, userId: {}", email, role, userId);
+            
+            return chain.filter(modifiedExchange);
             
         } catch (Exception e) {
             log.error("JWT validation failed: {}", e.getMessage());
             return unauthorized(exchange);
         }
-
-        return chain.filter(exchange);
     }
     
     private String extractJsonValue(String json, String key) {

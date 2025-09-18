@@ -2,6 +2,7 @@ package com.crediya.solicitudes.r2dbc;
 
 import com.crediya.solicitudes.model.loanapplication.LoanApplication;
 import com.crediya.solicitudes.model.loanstatus.LoanStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -12,8 +13,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Repository
-@ConditionalOnProperty(name = "app.mock-mode", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.mock-mode", havingValue = "true")
 public class MockLoanApplicationRepositoryAdapter implements com.crediya.solicitudes.model.loanapplication.gateways.LoanApplicationRepository {
 
     @Override
@@ -25,6 +27,7 @@ public class MockLoanApplicationRepositoryAdapter implements com.crediya.solicit
 
     @Override
     public Flux<LoanApplication> findByStatusIn(List<LoanStatus> statuses, int page, int size) {
+        log.info("[MOCK] Using mock data for statuses={} page={} size={}", statuses, page, size);
         return Flux.fromIterable(List.of(
             LoanApplication.builder()
                 .id("1")
