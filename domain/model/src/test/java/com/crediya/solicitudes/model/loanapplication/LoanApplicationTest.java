@@ -77,7 +77,7 @@ class LoanApplicationTest {
     void shouldCreateLoanApplicationWithConstructor() {
         OffsetDateTime now = OffsetDateTime.now();
         LoanApplication loan = new LoanApplication(
-                "789", "11111111", "jane@example.com", "Jane Smith",
+                "789", "user-id", "11111111", "jane@example.com", "Jane Smith",
                 BigDecimal.valueOf(25000), 18, "AUTO",
                 BigDecimal.valueOf(4.5), BigDecimal.valueOf(4000),
                 BigDecimal.valueOf(1500), LoanStatus.PENDING_REVIEW, now

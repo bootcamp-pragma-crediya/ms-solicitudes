@@ -5,6 +5,7 @@ import com.crediya.solicitudes.model.user.gateways.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "user.service.enabled", havingValue = "true", matchIfMissing = false)
 public class UserRepositoryAdapter implements UserRepository {
 
     private final WebClient webClient;

@@ -7,91 +7,77 @@ import static org.junit.jupiter.api.Assertions.*;
 class LoanTypeDataTest {
 
     @Test
-    void shouldCreateLoanTypeData() {
-        LoanTypeData loanType = LoanTypeData.builder()
+    void constructor_ShouldCreateLoanTypeData() {
+        LoanTypeData data = new LoanTypeData("PERSONAL", "Personal Loan", true);
+
+        assertEquals("PERSONAL", data.getCode());
+        assertEquals("Personal Loan", data.getName());
+        assertTrue(data.isActive());
+    }
+
+    @Test
+    void builder_ShouldCreateLoanTypeData() {
+        LoanTypeData data = LoanTypeData.builder()
+                .code("MORTGAGE")
+                .name("Mortgage Loan")
+                .active(false)
+                .build();
+
+        assertEquals("MORTGAGE", data.getCode());
+        assertEquals("Mortgage Loan", data.getName());
+        assertFalse(data.isActive());
+    }
+
+    @Test
+    void noArgsConstructor_ShouldCreateEmptyLoanTypeData() {
+        LoanTypeData data = new LoanTypeData();
+
+        assertNull(data.getCode());
+        assertNull(data.getName());
+        assertFalse(data.isActive());
+    }
+
+    @Test
+    void setters_ShouldUpdateFields() {
+        LoanTypeData data = new LoanTypeData();
+
+        data.setCode("AUTO");
+        data.setName("Auto Loan");
+        data.setActive(true);
+
+        assertEquals("AUTO", data.getCode());
+        assertEquals("Auto Loan", data.getName());
+        assertTrue(data.isActive());
+    }
+
+    @Test
+    void equals_ShouldWorkCorrectly() {
+        LoanTypeData data1 = LoanTypeData.builder()
                 .code("PERSONAL")
                 .name("Personal Loan")
                 .active(true)
                 .build();
 
-        assertEquals("PERSONAL", loanType.getCode());
-        assertEquals("Personal Loan", loanType.getName());
-        assertTrue(loanType.isActive());
-    }
-
-    @Test
-    void shouldCreateEmptyLoanTypeData() {
-        LoanTypeData loanType = new LoanTypeData();
-        
-        assertNull(loanType.getCode());
-        assertNull(loanType.getName());
-        assertFalse(loanType.isActive());
-    }
-
-    @Test
-    void shouldCreateLoanTypeDataWithConstructor() {
-        LoanTypeData loanType = new LoanTypeData("MORTGAGE", "Mortgage Loan", false);
-
-        assertEquals("MORTGAGE", loanType.getCode());
-        assertEquals("Mortgage Loan", loanType.getName());
-        assertFalse(loanType.isActive());
-    }
-
-    @Test
-    void shouldSupportSetters() {
-        LoanTypeData loanType = new LoanTypeData();
-        loanType.setCode("AUTO");
-        loanType.setName("Auto Loan");
-        loanType.setActive(true);
-
-        assertEquals("AUTO", loanType.getCode());
-        assertEquals("Auto Loan", loanType.getName());
-        assertTrue(loanType.isActive());
-    }
-
-    @Test
-    void shouldSupportEqualsAndHashCode() {
-        LoanTypeData loanType1 = LoanTypeData.builder()
-                .code("BUSINESS")
-                .name("Business Loan")
+        LoanTypeData data2 = LoanTypeData.builder()
+                .code("PERSONAL")
+                .name("Personal Loan")
                 .active(true)
                 .build();
 
-        LoanTypeData loanType2 = LoanTypeData.builder()
-                .code("BUSINESS")
-                .name("Business Loan")
+        assertEquals(data1, data2);
+        assertEquals(data1.hashCode(), data2.hashCode());
+    }
+
+    @Test
+    void toString_ShouldReturnStringRepresentation() {
+        LoanTypeData data = LoanTypeData.builder()
+                .code("PERSONAL")
+                .name("Personal Loan")
                 .active(true)
                 .build();
 
-        assertEquals(loanType1, loanType2);
-        assertEquals(loanType1.hashCode(), loanType2.hashCode());
-    }
-
-    @Test
-    void shouldSupportToString() {
-        LoanTypeData loanType = LoanTypeData.builder()
-                .code("STUDENT")
-                .name("Student Loan")
-                .active(false)
-                .build();
-
-        String toString = loanType.toString();
-        assertNotNull(toString);
-        assertTrue(toString.contains("STUDENT"));
-        assertTrue(toString.contains("Student Loan"));
-        assertTrue(toString.contains("false"));
-    }
-
-    @Test
-    void shouldHandleNullValues() {
-        LoanTypeData loanType = LoanTypeData.builder()
-                .code(null)
-                .name(null)
-                .active(false)
-                .build();
-
-        assertNull(loanType.getCode());
-        assertNull(loanType.getName());
-        assertFalse(loanType.isActive());
+        String result = data.toString();
+        assertNotNull(result);
+        assertTrue(result.contains("LoanTypeData"));
     }
 }

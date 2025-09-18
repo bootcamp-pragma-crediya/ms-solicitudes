@@ -63,7 +63,7 @@ class LoanApplicationUseCaseTest {
         when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // When & Then
-        StepVerifier.create(useCase.execute(input, TEST_USER_ID))
+        StepVerifier.create(useCase.execute(input, TEST_USER_ID, "test@email.com"))
                 .expectNextMatches(result -> 
                     result.getId().equals("generated-id") &&
                     result.getStatus() == LoanStatus.PENDING_REVIEW &&
@@ -76,7 +76,7 @@ class LoanApplicationUseCaseTest {
     void shouldFailWhenApplicationIsNull() {
         when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
         
-        StepVerifier.create(useCase.execute(null, TEST_USER_ID))
+        StepVerifier.create(useCase.execute(null, TEST_USER_ID, "test@email.com"))
                 .expectError(InvalidLoanApplicationException.class)
                 .verify();
     }
@@ -91,7 +91,7 @@ class LoanApplicationUseCaseTest {
 
         when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        StepVerifier.create(useCase.execute(input, TEST_USER_ID))
+        StepVerifier.create(useCase.execute(input, TEST_USER_ID, "test@email.com"))
                 .expectError(InvalidLoanApplicationException.class)
                 .verify();
     }
@@ -106,7 +106,7 @@ class LoanApplicationUseCaseTest {
 
         when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        StepVerifier.create(useCase.execute(input, TEST_USER_ID))
+        StepVerifier.create(useCase.execute(input, TEST_USER_ID, "test@email.com"))
                 .expectError(InvalidLoanApplicationException.class)
                 .verify();
     }
@@ -122,7 +122,7 @@ class LoanApplicationUseCaseTest {
         when(tx.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(loanTypeRepository.existsActiveByCode("INVALID_TYPE")).thenReturn(Mono.just(false));
 
-        StepVerifier.create(useCase.execute(input, TEST_USER_ID))
+        StepVerifier.create(useCase.execute(input, TEST_USER_ID, "test@email.com"))
                 .expectError(InvalidLoanTypeException.class)
                 .verify();
     }

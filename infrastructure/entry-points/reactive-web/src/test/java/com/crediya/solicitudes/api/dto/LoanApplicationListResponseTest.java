@@ -4,74 +4,48 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 class LoanApplicationListResponseTest {
 
     @Test
-    void shouldCreateResponseWithAllFields() {
-        // Given
-        String id = "1";
-        BigDecimal amount = BigDecimal.valueOf(10000);
-        Integer termMonths = 12;
-        String email = "test@test.com";
-        String customerName = "Test User";
-        String loanType = "PERSONAL";
-        BigDecimal interestRate = BigDecimal.valueOf(0.15);
-        String status = "PENDING_REVIEW";
-        BigDecimal baseSalary = BigDecimal.valueOf(5000);
-        BigDecimal monthlyPayment = BigDecimal.valueOf(900);
-        
-        // When
+    void shouldCreateLoanApplicationListResponse() {
         LoanApplicationListResponse response = new LoanApplicationListResponse(
-                id, amount, termMonths, email, customerName, loanType, 
-                interestRate, status, baseSalary, monthlyPayment);
-        
-        // Then
-        assertThat(response.id()).isEqualTo(id);
-        assertThat(response.amount()).isEqualTo(amount);
-        assertThat(response.termMonths()).isEqualTo(termMonths);
-        assertThat(response.email()).isEqualTo(email);
-        assertThat(response.customerName()).isEqualTo(customerName);
-        assertThat(response.loanType()).isEqualTo(loanType);
-        assertThat(response.interestRate()).isEqualTo(interestRate);
-        assertThat(response.status()).isEqualTo(status);
-        assertThat(response.baseSalary()).isEqualTo(baseSalary);
-        assertThat(response.monthlyPayment()).isEqualTo(monthlyPayment);
+                "1", "user1", "12345678", BigDecimal.valueOf(10000), 12,
+                "test@email.com", "Test User", "PERSONAL", "PENDING_REVIEW", 
+                BigDecimal.valueOf(3000000)
+        );
+
+        assertEquals("1", response.getId());
+        assertEquals("user1", response.getUserId());
+        assertEquals("12345678", response.getCustomerDocument());
+        assertEquals(BigDecimal.valueOf(10000), response.getAmount());
+        assertEquals(12, response.getTermMonths());
+        assertEquals("test@email.com", response.getEmail());
+        assertEquals("Test User", response.getCustomerName());
+        assertEquals("PERSONAL", response.getLoanType());
+        assertEquals("PENDING_REVIEW", response.getStatus());
+        assertEquals(BigDecimal.valueOf(3000000), response.getBaseSalary());
     }
-    
+
     @Test
-    void shouldSupportEqualsAndHashCode() {
-        // Given
-        LoanApplicationListResponse response1 = new LoanApplicationListResponse(
-                "1", BigDecimal.valueOf(10000), 12, "test@test.com", "Test User", 
-                "PERSONAL", BigDecimal.valueOf(0.15), "PENDING_REVIEW", 
-                BigDecimal.valueOf(5000), BigDecimal.valueOf(900));
-        LoanApplicationListResponse response2 = new LoanApplicationListResponse(
-                "1", BigDecimal.valueOf(10000), 12, "test@test.com", "Test User", 
-                "PERSONAL", BigDecimal.valueOf(0.15), "PENDING_REVIEW", 
-                BigDecimal.valueOf(5000), BigDecimal.valueOf(900));
+    void shouldCreateEmptyResponse() {
+        LoanApplicationListResponse response = new LoanApplicationListResponse();
         
-        // Then
-        assertThat(response1).isEqualTo(response2);
-        assertThat(response1.hashCode()).isEqualTo(response2.hashCode());
+        assertNull(response.getId());
+        assertNull(response.getUserId());
+        assertNull(response.getCustomerDocument());
     }
-    
+
     @Test
-    void shouldSupportToString() {
-        // Given
-        LoanApplicationListResponse response = new LoanApplicationListResponse(
-                "1", BigDecimal.valueOf(10000), 12, "test@test.com", "Test User", 
-                "PERSONAL", BigDecimal.valueOf(0.15), "PENDING_REVIEW", 
-                BigDecimal.valueOf(5000), BigDecimal.valueOf(900));
+    void shouldSetAndGetValues() {
+        LoanApplicationListResponse response = new LoanApplicationListResponse();
+        response.setId("1");
+        response.setUserId("user1");
+        response.setAmount(BigDecimal.valueOf(5000));
         
-        // When
-        String result = response.toString();
-        
-        // Then
-        assertThat(result).contains("1");
-        assertThat(result).contains("10000");
-        assertThat(result).contains("test@test.com");
-        assertThat(result).contains("Test User");
+        assertEquals("1", response.getId());
+        assertEquals("user1", response.getUserId());
+        assertEquals(BigDecimal.valueOf(5000), response.getAmount());
     }
 }

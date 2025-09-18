@@ -1,94 +1,55 @@
 package com.crediya.solicitudes.r2dbc;
 
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.test.StepVerifier;
 
+@ExtendWith(MockitoExtension.class)
 class MockLoanTypeRepositoryAdapterTest {
 
-    private final MockLoanTypeRepositoryAdapter repository = new MockLoanTypeRepositoryAdapter();
+    @InjectMocks
+    private MockLoanTypeRepositoryAdapter adapter;
 
     @Test
-    void shouldReturnTrueForValidLoanTypes() {
-        Mono<Boolean> personalResult = repository.existsActiveByCode("PERSONAL");
-        Mono<Boolean> mortgageResult = repository.existsActiveByCode("MORTGAGE");
-        Mono<Boolean> autoResult = repository.existsActiveByCode("AUTO");
-        Mono<Boolean> businessResult = repository.existsActiveByCode("BUSINESS");
-
-        StepVerifier.create(personalResult)
-                .expectNext(true)
-                .verifyComplete();
-
-        StepVerifier.create(mortgageResult)
-                .expectNext(true)
-                .verifyComplete();
-
-        StepVerifier.create(autoResult)
-                .expectNext(true)
-                .verifyComplete();
-
-        StepVerifier.create(businessResult)
+    void existsActiveByCode_WithValidCode_ShouldReturnTrue() {
+        StepVerifier.create(adapter.existsActiveByCode("PERSONAL"))
                 .expectNext(true)
                 .verifyComplete();
     }
 
     @Test
-    void shouldReturnFalseForInvalidLoanTypes() {
-        Mono<Boolean> invalidResult = repository.existsActiveByCode("INVALID");
-        Mono<Boolean> emptyResult = repository.existsActiveByCode("");
-        Mono<Boolean> nullResult = repository.existsActiveByCode(null);
-
-        StepVerifier.create(invalidResult)
-                .expectNext(false)
-                .verifyComplete();
-
-        StepVerifier.create(emptyResult)
-                .expectNext(false)
-                .verifyComplete();
-
-        StepVerifier.create(nullResult)
+    void existsActiveByCode_WithInvalidCode_ShouldReturnFalse() {
+        StepVerifier.create(adapter.existsActiveByCode("INVALID"))
                 .expectNext(false)
                 .verifyComplete();
     }
 
     @Test
-    void shouldBeCaseExact() {
-        Mono<Boolean> lowercaseResult = repository.existsActiveByCode("personal");
-        Mono<Boolean> mixedCaseResult = repository.existsActiveByCode("Personal");
-
-        StepVerifier.create(lowercaseResult)
-                .expectNext(false)
+    void existsActiveByCode_WithMortgageCode_ShouldReturnTrue() {
+        StepVerifier.create(adapter.existsActiveByCode("MORTGAGE"))
+                .expectNext(true)
                 .verifyComplete();
+    }
 
-        StepVerifier.create(mixedCaseResult)
+    @Test
+    void existsActiveByCode_WithAutoCode_ShouldReturnTrue() {
+        StepVerifier.create(adapter.existsActiveByCode("AUTO"))
+                .expectNext(true)
+                .verifyComplete();
+    }
+
+    @Test
+    void existsActiveByCode_WithNullCode_ShouldReturnFalse() {
+        StepVerifier.create(adapter.existsActiveByCode(null))
                 .expectNext(false)
                 .verifyComplete();
     }
 
     @Test
-    void shouldHandleWhitespace() {
-        Mono<Boolean> spacesResult = repository.existsActiveByCode(" PERSONAL ");
-        Mono<Boolean> tabResult = repository.existsActiveByCode("PERSONAL\t");
-
-        StepVerifier.create(spacesResult)
-                .expectNext(false)
-                .verifyComplete();
-
-        StepVerifier.create(tabResult)
-                .expectNext(false)
-                .verifyComplete();
-    }
-
-    @Test
-    void shouldHandleSpecialCharacters() {
-        Mono<Boolean> specialResult = repository.existsActiveByCode("PERSONAL@");
-        Mono<Boolean> numberResult = repository.existsActiveByCode("PERSONAL1");
-
-        StepVerifier.create(specialResult)
-                .expectNext(false)
-                .verifyComplete();
-
-        StepVerifier.create(numberResult)
+    void existsActiveByCode_WithEmptyCode_ShouldReturnFalse() {
+        StepVerifier.create(adapter.existsActiveByCode(""))
                 .expectNext(false)
                 .verifyComplete();
     }

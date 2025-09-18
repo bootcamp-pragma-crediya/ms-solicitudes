@@ -3,42 +3,50 @@ package com.crediya.solicitudes.r2dbc.config;
 import io.r2dbc.spi.ConnectionFactory;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PostgreSQLConnectionPoolTest {
 
     @Test
     void shouldCreateConnectionFactory() {
-        // Given
-        PostgreSQLConnectionPool config = new PostgreSQLConnectionPool();
+        PostgreSQLConnectionPool pool = new PostgreSQLConnectionPool();
         PostgresqlConnectionProperties properties = new PostgresqlConnectionProperties(
-                "localhost", 5432, "testdb", "public", "user", "pass");
+                "localhost", 5432, "test", "public", "user", "pass"
+        );
         
-        // When
-        ConnectionFactory factory = config.connectionFactory(properties);
+        ConnectionFactory factory = pool.connectionFactory(properties);
         
-        // Then
-        assertThat(factory).isNotNull();
+        assertNotNull(factory);
     }
-    
+
     @Test
-    void shouldCreateConnectionFactoryWithDefaults() {
-        // Given
-        PostgreSQLConnectionPool config = new PostgreSQLConnectionPool();
+    void shouldUseDefaultPortWhenNull() {
+        PostgreSQLConnectionPool pool = new PostgreSQLConnectionPool();
         PostgresqlConnectionProperties properties = new PostgresqlConnectionProperties(
-                "localhost", null, "testdb", null, "user", "pass");
+                "localhost", null, "test", "public", "user", "pass"
+        );
         
-        // When
-        ConnectionFactory factory = config.connectionFactory(properties);
+        ConnectionFactory factory = pool.connectionFactory(properties);
         
-        // Then
-        assertThat(factory).isNotNull();
+        assertNotNull(factory);
     }
-    
+
+    @Test
+    void shouldUseDefaultSchemaWhenNull() {
+        PostgreSQLConnectionPool pool = new PostgreSQLConnectionPool();
+        PostgresqlConnectionProperties properties = new PostgresqlConnectionProperties(
+                "localhost", 5432, "test", null, "user", "pass"
+        );
+        
+        ConnectionFactory factory = pool.connectionFactory(properties);
+        
+        assertNotNull(factory);
+    }
+
     @Test
     void shouldHaveCorrectConstants() {
-        assertThat(PostgreSQLConnectionPool.INITIAL_SIZE).isEqualTo(12);
-        assertThat(PostgreSQLConnectionPool.MAX_SIZE).isEqualTo(15);
-        assertThat(PostgreSQLConnectionPool.MAX_IDLE_TIME_MINUTES).isEqualTo(30);
+        assertEquals(12, PostgreSQLConnectionPool.INITIAL_SIZE);
+        assertEquals(15, PostgreSQLConnectionPool.MAX_SIZE);
+        assertEquals(30, PostgreSQLConnectionPool.MAX_IDLE_TIME_MINUTES);
     }
 }
